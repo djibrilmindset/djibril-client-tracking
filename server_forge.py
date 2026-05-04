@@ -223,6 +223,33 @@ async def save_entry(entry_date: str, request: Request):
         
         return dict(new)
 
+
+# ─── LLM Logs endpoint ─────────────────────────────────────
+LOG_DIR = BASE / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LLM_CALLS_FILE = LOG_DIR / "hermes_llm_calls.jsonl"
+
+@app.post("/api/llm/log")
+async def llm_log(request: Request):
+    """Endpoint pour hermes_call.sh → log structuré dans le fichier JSONL"""
+    body = await request.json()
+    ts = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    entry = {
+        "ts": ts,
+        "agent": body.get("agent", "hermes"),
+        "model": body.get("model", "unknown"),
+        "tier": body.get("tier", 3),
+        "tokens_in": body.get("tokens_in", 0),
+        "tokens_out": body.get("tokens_out", 0),
+        "cost_usd": body.get("cost_usd", 0.0),
+        "task_type": body.get("task_type", ""),
+        "result_summary": body.get("result_summary", ""),
+    }
+    with open(str(LLM_CALLS_FILE), "a") as f:
+        f.write(json.dumps(entry) + "\n")
+    return {"status": "logged"}
+
+
 # ─── Pages ────────────────────────────────────────────────
 @app.get("/")
 @app.get("/app")
