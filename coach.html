@@ -2,135 +2,319 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Coach · Djibril Tracking</title>
 <link rel="stylesheet" href="forge.css">
 <style>
-  .app-c { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1 }
-  .admin-header { display:flex; align-items:center; gap:14px; padding:18px 0; border-bottom:1px solid var(--line); margin-bottom:24px; position:sticky; top:0; background:rgba(246,241,232,0.92); backdrop-filter:blur(14px); z-index:50 }
-  .app-brand { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--ink) }
-  .badge-coach { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:var(--r-pill); background:var(--plum-soft); color:var(--plum); font-size:12px; font-weight:600 }
-  .page-id { font-family:var(--font-serif); font-size:clamp(36px,5vw,56px); font-style:italic; color:var(--ink); margin-bottom:24px }
-  .page-id em { color:var(--ember) }
-  .kpi-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px }
-  @media(max-width:700px){ .kpi-bar{grid-template-columns:repeat(2,1fr)} }
-  .kpi-card { background:var(--paper-soft); border:1px solid var(--line); border-radius:var(--r-md); padding:16px; text-align:center }
-  .kpi-num { font-family:var(--font-display); font-size:24px; font-weight:700; color:var(--ink) }
-  .kpi-label { font-size:11px; color:var(--ink-4); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px }
-  .section-title { font-family:var(--font-display); font-size:20px; color:var(--ink); margin:32px 0 16px }
-  table { width:100%; border-collapse:collapse }
-  th { text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--ink-4); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--line-strong); background:var(--paper-soft) }
-  td { padding:12px 14px; border-bottom:1px solid var(--line); font-size:14px }
-  tr:hover td { background:var(--ember-soft) }
-  a { color:var(--ember); text-decoration:none; font-weight:600; cursor:pointer }
-  .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px }
-  .status-filled { background:var(--ember) }
-  .status-missing { background:var(--ink-4) }
-  .btn-back { display:inline-block; padding:8px 18px; border:1px solid var(--line-strong); border-radius:var(--r-pill); font-size:13px; font-weight:600; cursor:pointer; background:var(--paper-soft); color:var(--ink-3); text-decoration:none }
-  .btn-back:hover { background:var(--paper-deep) }
-  .audit-log { background:#1a1614; color:#d4ccc4; border-radius:var(--r-md); padding:20px; font-family:var(--font-mono); font-size:12px; max-height:400px; overflow-y:auto; margin-top:16px; line-height:1.6 }
-  .audit-line { padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05) }
-  .empty-state { text-align:center; padding:48px; color:var(--ink-4) }
-  .refresh-btn { display:inline-block; padding:6px 16px; border:1px solid var(--line-strong); border-radius:var(--r-pill); font-size:12px; cursor:pointer; background:var(--paper-soft); color:var(--ink-3); margin-left:12px }
-  .refresh-btn:hover { background:var(--paper-deep) }
-  .nav-link { color:var(--ember); text-decoration:none; font-weight:600; font-size:13px; padding:6px 12px; border:1px solid var(--ember); border-radius:var(--r-pill); transition:all .2s }
-  .nav-link:hover { background:var(--ember-soft) }
+/* COSMOS */
+.cosmos{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.cosmos .particle{position:absolute;border-radius:50%;animation:float-up linear infinite;opacity:0}
+.cosmos .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+@keyframes float-up{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:0.6}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+
+/* LAYOUT */
+.app-c{max-width:1100px;margin:0 auto;padding:0 16px 80px;position:relative;z-index:1}
+.admin-header{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);margin-bottom:16px;position:sticky;top:0;background:rgba(246,241,232,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:50;flex-wrap:wrap}
+.app-brand{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.3px}
+.badge-coach{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-pill);background:var(--plum-soft);color:var(--plum);font-size:11px;font-weight:600;white-space:nowrap}
+.nav-link{color:var(--ember);text-decoration:none;font-weight:600;font-size:12px;padding:6px 10px;border:1px solid var(--ember);border-radius:var(--r-pill);white-space:nowrap}
+.refresh-btn{padding:6px 14px;border:1px solid var(--line-strong);border-radius:var(--r-pill);font-size:12px;cursor:pointer;background:var(--paper-soft);color:var(--ink-3);white-space:nowrap}
+.refresh-btn:hover{background:var(--paper-deep)}
+
+.page-id{font-family:var(--font-serif);font-size:clamp(32px,5vw,48px);font-style:italic;color:var(--ink);margin-bottom:16px}
+.page-id em{color:var(--ember)}
+
+/* KPIS */
+.kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:500px){.kpi-bar{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 12px;text-align:center}
+.kpi-num{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--ink)}
+.kpi-label{font-size:10px;color:var(--ink-4);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+
+/* FILTERS */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-pill{padding:6px 16px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--paper);color:var(--ink-3);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.filter-pill.active{background:var(--ember);border-color:var(--ember);color:#fff}
+.filter-pill .count{font-size:10px;opacity:0.7;margin-left:4px}
+
+/* TABLE */
+.section-title{font-family:var(--font-display);font-size:18px;color:var(--ink);margin:24px 0 12px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:10px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--line-strong);background:var(--paper-soft)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+tr:hover td{background:var(--ember-soft)}
+a{color:var(--ember);text-decoration:none;font-weight:600;cursor:pointer}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-filled{background:var(--ember);box-shadow:0 0 6px rgba(232,93,44,0.4)}
+.status-missing{background:var(--ink-4)}
+.suspect-row td{background:var(--blood-soft)}
+
+/* DETAIL PAGE */
+.btn-back{display:inline-block;padding:8px 18px;border:1px solid var(--line-strong);border-radius:var(--r-pill);font-size:13px;font-weight:600;cursor:pointer;background:var(--paper-soft);color:var(--ink-3);margin-bottom:12px}
+.audit-log{background:#1a1614;color:#d4ccc4;border-radius:var(--r-md);padding:16px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow-y:auto;margin-top:12px;line-height:1.6}
+.audit-line{padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.audit-line.update{color:#f59e0b}
+
+/* GRID 30 JOURS */
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:16px 0}
+.day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:600;cursor:default;position:relative}
+.day-filled{background:var(--ember);color:#fff}
+.day-missed{background:var(--line);color:var(--ink-4)}
+.day-modified{background:var(--gold);color:#fff}
+.day-modified::after{content:'M';position:absolute;top:1px;right:3px;font-size:7px;font-weight:700}
+.day-today{border:2px solid var(--ember)!important}
+.day-future{background:transparent;border:1px dashed var(--line);color:var(--ink-4)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;font-size:11px;color:var(--ink-3)}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* SUSPECT BANNER */
+.suspect-banner{background:var(--blood-soft);color:var(--blood);padding:12px 16px;border-radius:var(--r-md);margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:rgba(246,241,232,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border:none;background:none;cursor:pointer;color:var(--ink-4);font-size:10px;font-weight:500;transition:all .2s}
+.nav-item .nav-icon{font-size:18px}
+.nav-item.active{color:var(--ember)}
+.nav-item .nav-dot{width:4px;height:4px;border-radius:50%;background:var(--ember);opacity:0}
+.nav-item.active .nav-dot{opacity:1}
+
+.empty-state{text-align:center;padding:48px 16px;color:var(--ink-4);font-size:14px}
+
+@media(min-width:768px){
+  .app-c{padding:0 24px 80px}
+  .bottom-nav{max-width:680px;left:50%;transform:translateX(-50%);border-radius:var(--r-lg) var(--r-lg) 0 0}
+}
+
+/* Mobile table scrolling */
+@media(max-width:600px){
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  th,td{padding:8px 6px;font-size:11px}
+}
 </style>
 </head>
 <body>
-<div class="cosmos" aria-hidden="true"></div>
+<div class="cosmos" id="cosmos" aria-hidden="true"></div>
 <div id="app"><div class="app-c" style="text-align:center;padding:80px">Chargement...</div></div>
 
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="nav-item active" data-page="list">
+    <span class="nav-icon">👥</span>Élèves
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-item" data-page="missing">
+    <span class="nav-icon">⚠️</span>Manquants
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-item" data-page="audit">
+    <span class="nav-icon">🔍</span>Audit
+    <span class="nav-dot"></span>
+  </button>
+</nav>
+
 <script>
-var API = 'https://nbnbsljqtolzzuqnkyae.supabase.co/functions/v1/tracking-app/api/coach';
-var students = [];
+// COSMOS
+(function(){
+  var c=document.getElementById('cosmos');
+  for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';p.style.width=(3+Math.random()*6)+'px';p.style.height=p.style.width;var cols=['#e85d2c','#d4951a','#6b3a4f'];p.style.background=cols[Math.floor(Math.random()*cols.length)];c.appendChild(p)}
+  for(var i=0;i<25;i++){var s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';c.appendChild(s)}
+})();
 
-async function load() {
-  document.getElementById('app').innerHTML = '<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
-  var res = await fetch(API + '/students');
-  students = await res.json();
-  var stats = await fetch(API + '/stats').then(function(r) { return r.json(); });
-  renderList(stats);
-}
+var API='https://nbnbsljqtolzzuqnkyae.supabase.co/functions/v1/tracking-app/api/coach';
+var students=[];
+var currentFilter='all';
+var currentView='list';
 
-function renderList(stats) {
-  var rows = '';
-  students.forEach(function(s) {
-    var filled = s.has_filled;
-    rows += '<tr>' +
-      '<td>' + s.first_name + ' ' + (s.full_name||'') + '</td>' +
-      '<td>' + s.email + '</td>' +
-      '<td><span class="status-dot ' + (filled?'status-filled':'status-missing') + '"></span>' + (filled?'Rempli':'Manquant') + '</td>' +
-      '<td><a onclick="showDetail(\'' + s.id + '\')">Voir →</a></td>' +
-      '</tr>';
-  });
-  document.getElementById('app').innerHTML = '<div class="app-c">' +
-    '<header class="admin-header">' +
-    '<div class="app-brand">Tracking Coach</div>' +
-    '<span class="badge-coach">🔐 Coach</span>' +
-    '<span style="flex:1"></span>' +
-    '<a class="nav-link" href="index.html">← Élève</a>' +
-    '<button class="refresh-btn" onclick="load()">Rafraîchir</button>' +
-    '</header>' +
-    '<h1 class="page-id">Mes <em>élèves</em></h1>' +
-    '<div class="kpi-bar">' +
-    '<div class="kpi-card"><div class="kpi-num">' + (stats.total||0) + '</div><div class="kpi-label">Total</div></div>' +
-    '<div class="kpi-card"><div class="kpi-num">' + (stats.filled||0) + '</div><div class="kpi-label">Remplis</div></div>' +
-    '<div class="kpi-card"><div class="kpi-num">' + (stats.missing||0) + '</div><div class="kpi-label">Manquants</div></div>' +
-    '<div class="kpi-card"><div class="kpi-num">' + (stats.ca_total||0).toFixed(0) + '€</div><div class="kpi-label">CA jour</div></div>' +
-    '</div>' +
-    '<h2 class="section-title">Liste</h2>' +
-    (students.length > 0 ? '<table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd\'hui</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>' : '<div class="empty-state">Aucun élève</div>') +
-    '</div>';
-}
-
-async function showDetail(id) {
-  document.getElementById('app').innerHTML = '<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
-  var res = await fetch(API + '/students/' + id);
-  var data = await res.json();
-  var s = data.student, entries = data.entries || [];
-
-  var entryRows = '';
-  entries.slice(0, 14).forEach(function(e) {
-    entryRows += '<tr>' +
-      '<td>' + e.entry_date + '</td>' +
-      '<td>' + e.calls + '</td><td>' + e.dm + '</td><td>' + e.videos + '</td>' +
-      '<td>' + (e.live?'Oui':'—') + '</td>' +
-      '<td>' + (e.ca_eur||0).toFixed(2) + '€</td>' +
-      '<td><strong>' + (e.calls*2 + e.dm + e.videos*3 + (e.live?5:0)) + '</strong></td>' +
-      '</tr>';
-  });
-
-  var auditHtml = '';
-  (data.audit||[]).forEach(function(a) {
-    var ts = (a.performed_at||'').slice(0,19);
-    var color = a.action === 'UPDATE' ? 'style="color:#f59e0b"' : '';
-    auditHtml += '<div class="audit-line" ' + color + '>' + ts + ' [' + a.action + '] ' + a.entry_date + '</div>';
-  });
-
-  var totalPts = entries.reduce(function(sum, e) { return sum + e.calls*2 + e.dm + e.videos*3 + (e.live?5:0); }, 0);
-  var totalCA = entries.reduce(function(sum, e) { return sum + (e.ca_eur||0); }, 0);
-
-  document.getElementById('app').innerHTML = '<div class="app-c">' +
-    '<header class="admin-header">' +
-    '<div class="app-brand">Tracking Coach</div>' +
-    '<a class="btn-back" onclick="load()">← Retour</a>' +
-    '</header>' +
-    '<h1 class="page-id" style="font-size:clamp(28px,4vw,40px)">' + s.first_name + ' <em>' + (s.full_name||'') + '</em></h1>' +
-    '<p style="color:var(--ink-3);margin-bottom:24px">' + s.email + ' · Inscrit le ' + (s.joined_at||'').slice(0,10) + '</p>' +
-    '<div class="kpi-bar" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px">' +
-    '<div class="kpi-card"><div class="kpi-num">' + entries.length + '</div><div class="kpi-label">Fiches</div></div>' +
-    '<div class="kpi-card"><div class="kpi-num">' + totalPts + '</div><div class="kpi-label">Points totaux</div></div>' +
-    '<div class="kpi-card"><div class="kpi-num">' + totalCA.toFixed(0) + '€</div><div class="kpi-label">CA cumulé</div></div>' +
-    '</div>' +
-    '<h2 class="section-title">Fiches récentes</h2>' +
-    (entryRows ? '<table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Points</th></tr></thead><tbody>' + entryRows + '</tbody></table>' : '<div class="empty-state">Aucune fiche</div>') +
-    '<h2 class="section-title" style="margin-top:32px">Audit log</h2>' +
-    '<div class="audit-log">' + (auditHtml || 'Aucune modification') + '</div>' +
-    '</div>';
-}
-
+// INIT
 load();
+
+async function load(){
+  document.getElementById('app').innerHTML='<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
+  var res=await fetch(API+'/students');students=await res.json();
+  var stats=await fetch(API+'/stats').then(function(r){return r.json();});
+  renderList(stats);
+  bindNav();
+}
+
+function bindNav(){
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      currentView=this.dataset.page;
+      document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      if(currentView==='list')load();
+      if(currentView==='missing')renderMissing();
+      if(currentView==='audit')renderAuditOverview();
+    });
+  });
+}
+
+function renderList(stats){
+  var filtered=students;
+  if(currentFilter==='filled')filtered=students.filter(function(s){return s.has_filled;});
+  if(currentFilter==='missing')filtered=students.filter(function(s){return !s.has_filled;});
+
+  var rows='';
+  filtered.forEach(function(s){
+    var filled=s.has_filled;
+    rows+='<tr class="'+(s.suspect?'suspect-row':'')+'"><td>'+esc(s.first_name)+' '+(s.full_name||'')+'</td><td>'+esc(s.email)+'</td><td><span class="status-dot '+(filled?'status-filled':'status-missing')+'"></span>'+(filled?'Rempli':'Manquant')+'</td><td><a onclick="showDetail(\''+s.id+'\')">Voir →</a></td></tr>';
+  });
+
+  var filledCount=students.filter(function(s){return s.has_filled;}).length;
+  var missingCount=students.length-filledCount;
+
+  document.getElementById('app').innerHTML='<div class="app-c">'+
+    '<header class="admin-header">'+
+      '<div class="app-brand">Tracking Coach</div>'+
+      '<span class="badge-coach">🔐 Coach</span>'+
+      '<span style="flex:1"></span>'+
+      '<a class="nav-link" href="index.html">← Élève</a>'+
+      '<button class="refresh-btn" onclick="load()">↻</button>'+
+    '</header>'+
+    '<h1 class="page-id">Mes <em>élèves</em></h1>'+
+    '<div class="kpi-bar">'+
+      '<div class="kpi-card"><div class="kpi-num">'+(stats.total||0)+'</div><div class="kpi-label">Total</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num">'+filledCount+'</div><div class="kpi-label">Remplis</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num">'+missingCount+'</div><div class="kpi-label">Manquants</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num">'+(stats.ca_total||0).toFixed(0)+'€</div><div class="kpi-label">CA jour</div></div>'+
+    '</div>'+
+    '<div class="filter-bar">'+
+      '<button class="filter-pill'+(currentFilter==='all'?' active':'')+'" onclick="setFilter(\'all\')">Tous<span class="count">'+(stats.total||0)+'</span></button>'+
+      '<button class="filter-pill'+(currentFilter==='filled'?' active':'')+'" onclick="setFilter(\'filled\')">Remplis<span class="count">'+filledCount+'</span></button>'+
+      '<button class="filter-pill'+(currentFilter==='missing'?' active':'')+'" onclick="setFilter(\'missing\')">Manquants<span class="count">'+missingCount+'</span></button>'+
+    '</div>'+
+    '<h2 class="section-title">Liste</h2>'+
+    (students.length>0?'<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd\'hui</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty-state">✨ Aucun élève — ils apparaîtront ici après leur première connexion</div>')+
+  '</div>';
+  bindNav();
+}
+
+function setFilter(f){
+  currentFilter=f;load();
+}
+
+async function showDetail(id){
+  document.getElementById('app').innerHTML='<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
+  var res=await fetch(API+'/students/'+id);
+  var data=await res.json();
+  var s=data.student,entries=data.entries||[],audit=data.audit||[];
+
+  // Entry rows (last 14)
+  var entryRows='';
+  entries.slice(0,14).forEach(function(e){
+    entryRows+='<tr><td>'+e.entry_date+'</td><td>'+e.calls+'</td><td>'+e.dm+'</td><td>'+e.videos+'</td><td>'+(e.live?'Oui':'—')+'</td><td>'+(e.ca_eur||0).toFixed(2)+'€</td><td><strong>'+(e.calls*2+e.dm+e.videos*3+(e.live?5:0))+'</strong></td></tr>';
+  });
+
+  // 30-day grid
+  var dayGrid='';
+  var today=new Date().toISOString().slice(0,10);
+  var entryMap={};
+  entries.forEach(function(e){entryMap[e.entry_date]=e;});
+  for(var i=29;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var ds=d.toISOString().slice(0,10);
+    var entry=entryMap[ds];
+    var cls='day-cell';
+    if(ds===today)cls+=' day-today';
+    if(entry){
+      if(entry.created_at!==entry.updated_at)cls+=' day-modified';
+      else cls+=' day-filled';
+    }else if(ds>today){
+      cls+=' day-future';
+    }else{
+      cls+=' day-missed';
+    }
+    dayGrid+='<div class="'+cls+'" title="'+ds+'">'+d.getDate()+'</div>';
+  }
+
+  // Audit log
+  var auditHtml='';
+  audit.forEach(function(a){
+    var ts=(a.performed_at||'').slice(0,19);
+    var cls=a.action==='UPDATE'?'update':'';
+    auditHtml+='<div class="audit-line '+cls+'">'+ts+' ['+a.action+'] '+a.entry_date+'</div>';
+  });
+
+  // Stats
+  var totalPts=entries.reduce(function(s,e){return s+e.calls*2+e.dm+e.videos*3+(e.live?5:0);},0);
+  var totalCA=entries.reduce(function(s,e){return s+(e.ca_eur||0);},0);
+  var liveDays=entries.filter(function(e){return e.live;}).length;
+  var missed7=0;for(var i=0;i<7;i++){var dd=new Date();dd.setDate(dd.getDate()-i);var dds=dd.toISOString().slice(0,10);if(!entryMap[dds]&&dds<=today)missed7++;}
+  var suspect=missed7>=3;
+
+  document.getElementById('app').innerHTML='<div class="app-c">'+
+    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><a class="btn-back" onclick="load()">← Retour</a></header>'+
+    (suspect?'<div class="suspect-banner">⚠️ Élève suspect : '+missed7+' oublis sur 7 jours</div>':'')+
+    '<h1 class="page-id" style="font-size:clamp(24px,4vw,36px)">'+s.first_name+' <em>'+(s.full_name||'')+'</em></h1>'+
+    '<p style="color:var(--ink-3);margin-bottom:16px">'+s.email+' · Inscrit le '+(s.joined_at||'').slice(0,10)+'</p>'+
+    '<div class="kpi-bar" style="grid-template-columns:repeat(4,1fr)">'+
+      '<div class="kpi-card"><div class="kpi-num">'+totalPts+'</div><div class="kpi-label">Points 90j</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num">'+totalCA.toFixed(0)+'€</div><div class="kpi-label">CA cumulé</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num">'+liveDays+'</div><div class="kpi-label">Lives 30j</div></div>'+
+      '<div class="kpi-card"><div class="kpi-num" style="color:'+(missed7>0?'var(--blood)':'var(--ink)')+'">'+missed7+'</div><div class="kpi-label">Manqués 7j</div></div>'+
+    '</div>'+
+    '<h2 class="section-title">Grille 30 jours</h2>'+
+    '<div class="day-grid">'+dayGrid+'</div>'+
+    '<div class="legend">'+
+      '<span><span class="dot" style="background:var(--ember)"></span>Rempli</span>'+
+      '<span><span class="dot" style="background:var(--line)"></span>Manqué</span>'+
+      '<span><span class="dot" style="background:var(--gold)"></span>Modifié rétro</span>'+
+    '</div>'+
+    '<h2 class="section-title">Fiches récentes</h2>'+
+    (entryRows?'<div class="table-wrap"><table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead><tbody>'+entryRows+'</tbody></table></div>':'<div class="empty-state">Aucune fiche</div>')+
+    '<h2 class="section-title">Audit log</h2>'+
+    '<div class="audit-log">'+(auditHtml||'Aucune modification')+'</div>'+
+  '</div>';
+  bindNav();
+}
+
+function renderMissing(){
+  var missing=students.filter(function(s){return !s.has_filled;});
+  document.getElementById('app').innerHTML='<div class="app-c">'+
+    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderMissing()">↻</button></header>'+
+    '<h1 class="page-id">Man<em>quants</em></h1>'+
+    '<p style="color:var(--ink-3);margin-bottom:16px">N\'ont pas rempli leur fiche aujourd\'hui</p>'+
+    (missing.length>0?missing.map(function(s){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);background:var(--paper-soft);margin-bottom:4px;border-radius:var(--r-sm)">'+
+        '<span style="font-size:20px">⚠️</span>'+
+        '<div><strong>'+s.first_name+' '+(s.full_name||'')+'</strong><br><span style="font-size:12px;color:var(--ink-4)">'+s.email+'</span></div>'+
+        '<span style="margin-left:auto"><a onclick="showDetail(\''+s.id+'\')">Voir →</a></span>'+
+      '</div>';
+    }).join(''):'<div class="empty-state">✅ Tout le monde a rempli sa fiche !</div>')+
+  '</div>';
+  bindNav();
+}
+
+function renderAuditOverview(){
+  document.getElementById('app').innerHTML='<div class="app-c">'+
+    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderAuditOverview()">↻</button></header>'+
+    '<h1 class="page-id">Piste d\'<em>audit</em></h1>'+
+    '<p style="color:var(--ink-3);margin-bottom:16px">Dernières modifications détectées</p>'+
+    '<div class="audit-log" style="max-height:500px">Chargement...</div>'+
+  '</div>';
+
+  // Fetch audit data for all students
+  Promise.all(students.map(async function(s){
+    var res=await fetch(API+'/students/'+s.id);
+    var data=await res.json();
+    return {student:s,audit:data.audit||[]};
+  })).then(function(results){
+    var allAudit=[];
+    results.forEach(function(r){
+      r.audit.forEach(function(a){
+        allAudit.push({student:r.student.first_name+' '+(r.student.full_name||''),action:a.action,date:a.entry_date,ts:a.performed_at});
+      });
+    });
+    allAudit.sort(function(a,b){return (b.ts||'')>(a.ts||'')?1:-1;});
+    var html=allAudit.slice(0,100).map(function(a){
+      return '<div class="audit-line'+(a.action==='UPDATE'?' update':'')+'">'+(a.ts||'').slice(0,19)+' ['+a.action+'] '+esc(a.student)+' · '+a.date+'</div>';
+    }).join('');
+    document.querySelector('.audit-log').innerHTML=html||'Aucune modification enregistrée';
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
 </html>
