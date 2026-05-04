@@ -3351,7 +3351,7 @@ body {
   .kpi__val { font-size: 28px; }
 }
 `;
-const H={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type"};
+const H={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"GET, POST, PUT, DELETE, OPTIONS"};
 const sb=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const K=Deno.env.get("TOKEN_SECRET")||"djibril-tracking-secret-2026";
 function gt(sid:string):string{const p=btoa(JSON.stringify({sid,exp:Date.now()+30*86400000}));return p+"."+btoa([...new Uint8Array(new TextEncoder().encode(p+K))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40))}
