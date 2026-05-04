@@ -1,0 +1,27 @@
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+major_version = 15
+
+[db.pooler]
+enabled = true
+pool_mode = "transaction"
+default_pool_size = 15
+
+[auth]
+enabled = true
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+
+[functions]
+enabled = true
+verify_jwt = false
+import_map = "./functions/import_map.json"
