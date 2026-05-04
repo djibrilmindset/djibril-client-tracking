@@ -2,315 +2,200 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Coach · Djibril Tracking</title>
-<link rel="stylesheet" href="forge.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --paper:#f3ecdf;--paper-2:#e9e0cf;--paper-soft:#faf6ee;
+  --ink:#1a1614;--ink-2:#3a322c;--ink-3:#6e5a4a;--ink-4:#9b8975;
+  --ember:#e85d2c;--ember-deep:#c73e1a;--gold:#d4951a;--plum:#6b3a4f;
+  --blood:#b42837;--cyan:#4aa9c4;
+  --serif:'Instrument Serif',Georgia,serif;--display:'Playfair Display',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;--body:'Inter',system-ui,sans-serif;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-pill:999px;
+  --grad-ember:linear-gradient(135deg,#fbbf24,#e85d2c);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--body);font-size:15px;color:var(--ink-2);background:var(--paper);min-height:100vh;overflow-x:hidden;position:relative}
+::selection{background:var(--ember);color:var(--paper-soft)}
+
 /* COSMOS */
-.cosmos{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
-.cosmos .particle{position:absolute;border-radius:50%;animation:float-up linear infinite;opacity:0}
-.cosmos .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
-@keyframes float-up{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:0.6}100%{transform:translateY(-10vh) scale(1);opacity:0}}
-@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+.cosmos{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.cosmos .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3;mix-blend-mode:multiply;animation:orb-float 24s ease-in-out infinite}
+.cosmos .orb.o1{width:400px;height:400px;top:-100px;right:-80px;background:radial-gradient(circle,#6b3a4f 0%,transparent 65%)}
+.cosmos .orb.o2{width:350px;height:350px;bottom:-100px;left:5%;background:radial-gradient(circle,#e85d2c 0%,transparent 65%);animation-duration:28s;animation-delay:-8s}
+.cosmos .orb.o3{width:300px;height:300px;top:50%;right:30%;background:radial-gradient(circle,#d4951a 0%,transparent 65%);animation-duration:22s;animation-delay:-14s}
+@keyframes orb-float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(.96)}}
+.cosmos .stars{position:absolute;inset:0;font-family:var(--serif);font-style:italic;color:rgba(26,22,20,.15);letter-spacing:.4em;line-height:2.6;font-size:13px;padding:40px;white-space:pre-wrap;animation:twinkle 8s steps(8) infinite;user-select:none}
+@keyframes twinkle{0%,100%{opacity:1}25%{opacity:.4}50%{opacity:.8}75%{opacity:.3}}
+.grain{position:fixed;inset:0;z-index:1000;pointer-events:none;mix-blend-mode:multiply;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.07 0 0 0 0 0.04 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@media(prefers-reduced-motion:reduce){.cosmos .orb{animation:none}}
 
 /* LAYOUT */
-.app-c{max-width:1100px;margin:0 auto;padding:0 16px 80px;position:relative;z-index:1}
-.admin-header{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);margin-bottom:16px;position:sticky;top:0;background:rgba(246,241,232,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:50;flex-wrap:wrap}
-.app-brand{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.3px}
-.badge-coach{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-pill);background:var(--plum-soft);color:var(--plum);font-size:11px;font-weight:600;white-space:nowrap}
-.nav-link{color:var(--ember);text-decoration:none;font-weight:600;font-size:12px;padding:6px 10px;border:1px solid var(--ember);border-radius:var(--r-pill);white-space:nowrap}
-.refresh-btn{padding:6px 14px;border:1px solid var(--line-strong);border-radius:var(--r-pill);font-size:12px;cursor:pointer;background:var(--paper-soft);color:var(--ink-3);white-space:nowrap}
-.refresh-btn:hover{background:var(--paper-deep)}
+.app{position:relative;z-index:1;min-height:100vh;padding-bottom:90px}
+.app-header{display:flex;align-items:center;gap:10px;padding:12px 16px;position:sticky;top:0;z-index:150;background:rgba(243,236,223,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,22,20,.08);flex-wrap:wrap}
+.app-brand{font-family:var(--display);font-weight:900;font-size:18px;color:var(--ink)}
+.badge-coach{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-pill);background:rgba(107,58,79,.1);color:var(--plum);font-size:10px;font-weight:600;white-space:nowrap;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.nav-link{color:var(--ember);text-decoration:none;font-weight:600;font-size:11px;padding:6px 10px;border:1px solid var(--ember);border-radius:var(--r-pill);white-space:nowrap;font-family:var(--mono)}
+.btn-back{display:inline-block;padding:8px 16px;border:1px solid rgba(26,22,20,.2);font-size:12px;cursor:pointer;background:transparent;color:var(--ink-3);margin-bottom:12px;font-family:var(--mono);border-radius:0}
+.btn-back:hover{background:var(--ink);color:var(--paper)}
+.refresh-btn{padding:6px 12px;border:1px solid rgba(26,22,20,.15);font-size:11px;cursor:pointer;background:transparent;color:var(--ink-3);white-space:nowrap;border-radius:0;font-family:var(--mono)}
+.refresh-btn:hover{background:var(--ink);color:var(--paper)}
+.app-main{max-width:1100px;margin:0 auto;padding:20px 16px}
 
-.page-id{font-family:var(--font-serif);font-size:clamp(32px,5vw,48px);font-style:italic;color:var(--ink);margin-bottom:16px}
-.page-id em{color:var(--ember)}
+/* PAGE ID */
+.page-id h1{font-family:var(--display);font-weight:900;font-size:clamp(32px,5vw,48px);color:var(--ink);line-height:1.1;letter-spacing:-.02em;margin-bottom:8px}
+.page-id h1 em{color:var(--ember)}
 
-/* KPIS */
-.kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-@media(max-width:500px){.kpi-bar{grid-template-columns:repeat(2,1fr)}}
-.kpi-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 12px;text-align:center}
-.kpi-num{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--ink)}
-.kpi-label{font-size:10px;color:var(--ink-4);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+/* KPI BAR */
+.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
+@media(max-width:600px){.kpi-bar{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:rgba(255,252,245,.85);border:1px solid rgba(26,22,20,.12);padding:12px;text-align:center}
+.kpi-card .kpi-num{font-family:var(--display);font-weight:900;font-size:22px;color:var(--ink);line-height:1}
+.kpi-card .kpi-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);margin-top:4px}
 
 /* FILTERS */
 .filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-pill{padding:6px 16px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--paper);color:var(--ink-3);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.filter-pill{padding:6px 16px;border:1px solid rgba(26,22,20,.2);background:transparent;color:var(--ink-3);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;border-radius:0;transition:all .15s}
 .filter-pill.active{background:var(--ember);border-color:var(--ember);color:#fff}
-.filter-pill .count{font-size:10px;opacity:0.7;margin-left:4px}
+.filter-pill:hover:not(.active){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.filter-pill .count{font-size:9px;opacity:.7;margin-left:4px}
 
 /* TABLE */
-.section-title{font-family:var(--font-display);font-size:18px;color:var(--ink);margin:24px 0 12px}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;padding:10px 12px;font-size:10px;font-weight:600;color:var(--ink-4);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--line-strong);background:var(--paper-soft)}
-td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
-tr:hover td{background:var(--ember-soft)}
-a{color:var(--ember);text-decoration:none;font-weight:600;cursor:pointer}
-.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.status-filled{background:var(--ember);box-shadow:0 0 6px rgba(232,93,44,0.4)}
+.section-title{font-family:var(--display);font-weight:900;font-size:17px;color:var(--ink);margin:20px 0 10px}
+table{width:100%;border-collapse:collapse;margin:8px 0}
+th{text-align:left;padding:8px 10px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);border-bottom:1px solid rgba(26,22,20,.15)}
+td{padding:10px;border-bottom:1px solid rgba(26,22,20,.06);font-size:13px}
+tr:hover td{background:rgba(232,93,44,.04)}
+a{color:var(--ember);text-decoration:none;font-weight:600;cursor:pointer;font-family:var(--mono);font-size:11px}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.status-filled{background:var(--ember);box-shadow:0 0 4px rgba(232,93,44,.4)}
 .status-missing{background:var(--ink-4)}
-.suspect-row td{background:var(--blood-soft)}
+.suspect-row td{background:rgba(180,40,55,.06)}
 
-/* DETAIL PAGE */
-.btn-back{display:inline-block;padding:8px 18px;border:1px solid var(--line-strong);border-radius:var(--r-pill);font-size:13px;font-weight:600;cursor:pointer;background:var(--paper-soft);color:var(--ink-3);margin-bottom:12px}
-.audit-log{background:#1a1614;color:#d4ccc4;border-radius:var(--r-md);padding:16px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow-y:auto;margin-top:12px;line-height:1.6}
-.audit-line{padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+/* DETAIL */
+.suspect-banner{background:rgba(180,40,55,.1);color:var(--blood);padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;border-left:3px solid var(--blood)}
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:12px 0}
+.day-cell{aspect-ratio:1;border:1px solid rgba(26,22,20,.15);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:600;position:relative;border-radius:var(--r-sm)}
+.day-filled{background:var(--ember);color:#fff;border-color:var(--ember)}
+.day-missed{background:rgba(26,22,20,.04);color:var(--ink-4)}
+.day-modified{background:var(--gold);color:#fff;border-color:var(--gold)}
+.day-modified::after{content:'M';position:absolute;top:1px;right:2px;font-size:6px;font-weight:700}
+.day-today{border:2px solid var(--ember)!important}
+.day-future{background:transparent;border-style:dashed;color:var(--ink-4)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 14px;font-size:10px;color:var(--ink-3);font-family:var(--mono)}
+.legend .dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px}
+
+/* AUDIT */
+.audit-log{background:var(--ink);color:#d4ccc4;padding:16px;font-family:var(--mono);font-size:10px;max-height:300px;overflow-y:auto;margin-top:10px;line-height:1.6;border-radius:0}
+.audit-line{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .audit-line.update{color:#f59e0b}
 
-/* GRID 30 JOURS */
-.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:16px 0}
-.day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:600;cursor:default;position:relative}
-.day-filled{background:var(--ember);color:#fff}
-.day-missed{background:var(--line);color:var(--ink-4)}
-.day-modified{background:var(--gold);color:#fff}
-.day-modified::after{content:'M';position:absolute;top:1px;right:3px;font-size:7px;font-weight:700}
-.day-today{border:2px solid var(--ember)!important}
-.day-future{background:transparent;border:1px dashed var(--line);color:var(--ink-4)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;font-size:11px;color:var(--ink-3)}
-.legend span{display:flex;align-items:center;gap:4px}
-.legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
-
-/* SUSPECT BANNER */
-.suspect-banner{background:var(--blood-soft);color:var(--blood);padding:12px 16px;border-radius:var(--r-md);margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-
 /* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:rgba(246,241,232,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border:none;background:none;cursor:pointer;color:var(--ink-4);font-size:10px;font-weight:500;transition:all .2s}
-.nav-item .nav-icon{font-size:18px}
-.nav-item.active{color:var(--ember)}
-.nav-item .nav-dot{width:4px;height:4px;border-radius:50%;background:var(--ember);opacity:0}
-.nav-item.active .nav-dot{opacity:1}
+.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(243,236,223,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(26,22,20,.1);padding:6px 0 env(safe-area-inset-bottom,6px);justify-content:space-around}
+.bottom-nav .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border:none;background:none;cursor:pointer;color:var(--ink-4);font-family:var(--mono);font-size:9px;letter-spacing:.04em;min-width:52px;transition:all .15s}
+.bottom-nav .nav-item .nav-icon{font-size:16px}
+.bottom-nav .nav-item.active{color:var(--ember)}
+.bottom-nav .nav-item .nav-dot{width:3px;height:3px;border-radius:50%;background:var(--ember);opacity:0}
+.bottom-nav .nav-item.active .nav-dot{opacity:1}
 
-.empty-state{text-align:center;padding:48px 16px;color:var(--ink-4);font-size:14px}
-
-@media(min-width:768px){
-  .app-c{padding:0 24px 80px}
-  .bottom-nav{max-width:680px;left:50%;transform:translateX(-50%);border-radius:var(--r-lg) var(--r-lg) 0 0}
-}
-
-/* Mobile table scrolling */
-@media(max-width:600px){
-  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  th,td{padding:8px 6px;font-size:11px}
-}
+.empty-state{text-align:center;padding:40px 16px;color:var(--ink-4);font-family:var(--serif);font-style:italic;font-size:14px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(min-width:768px){.bottom-nav{max-width:500px;left:50%;transform:translateX(-50%);border-radius:var(--r-lg) var(--r-lg) 0 0}}
 </style>
 </head>
 <body>
-<div class="cosmos" id="cosmos" aria-hidden="true"></div>
-<div id="app"><div class="app-c" style="text-align:center;padding:80px">Chargement...</div></div>
+<div class="cosmos"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="stars">✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦</div></div>
+<div class="grain"></div>
+
+<div id="app"><div style="text-align:center;padding:80px;font-family:var(--serif);font-style:italic;color:var(--ink-4);position:relative;z-index:1">Chargement...</div></div>
 
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="nav-item active" data-page="list">
-    <span class="nav-icon">👥</span>Élèves
-    <span class="nav-dot"></span>
-  </button>
-  <button class="nav-item" data-page="missing">
-    <span class="nav-icon">⚠️</span>Manquants
-    <span class="nav-dot"></span>
-  </button>
-  <button class="nav-item" data-page="audit">
-    <span class="nav-icon">🔍</span>Audit
-    <span class="nav-dot"></span>
-  </button>
+  <button class="nav-item active" data-page="list"><span class="nav-icon">◈</span>Élèves<span class="nav-dot"></span></button>
+  <button class="nav-item" data-page="missing"><span class="nav-icon">◆</span>Manquants<span class="nav-dot"></span></button>
+  <button class="nav-item" data-page="audit"><span class="nav-icon">◳</span>Audit<span class="nav-dot"></span></button>
 </nav>
 
 <script>
-// COSMOS
-(function(){
-  var c=document.getElementById('cosmos');
-  for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';p.style.width=(3+Math.random()*6)+'px';p.style.height=p.style.width;var cols=['#e85d2c','#d4951a','#6b3a4f'];p.style.background=cols[Math.floor(Math.random()*cols.length)];c.appendChild(p)}
-  for(var i=0;i<25;i++){var s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';c.appendChild(s)}
-})();
-
 var API='https://nbnbsljqtolzzuqnkyae.supabase.co/functions/v1/tracking-app/api/coach';
-var students=[];
-var currentFilter='all';
-var currentView='list';
+var students=[],currentFilter='all',currentView='list';
 
-// INIT
-load();
+load();bindNav();
 
 async function load(){
-  document.getElementById('app').innerHTML='<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
+  document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px;font-family:var(--serif);font-style:italic;color:var(--ink-4);position:relative;z-index:1">Chargement...</div>';
   var res=await fetch(API+'/students');students=await res.json();
   var stats=await fetch(API+'/stats').then(function(r){return r.json();});
-  renderList(stats);
-  bindNav();
+  renderList(stats);bindNav();
 }
 
 function bindNav(){
-  document.querySelectorAll('.nav-item').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      currentView=this.dataset.page;
-      document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
-      this.classList.add('active');
-      if(currentView==='list')load();
-      if(currentView==='missing')renderMissing();
-      if(currentView==='audit')renderAuditOverview();
-    });
-  });
+  document.querySelectorAll('.nav-item').forEach(function(btn){btn.addEventListener('click',function(){currentView=this.dataset.page;document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});this.classList.add('active');if(currentView==='list')load();if(currentView==='missing')renderMissing();if(currentView==='audit')renderAuditOverview();});});
 }
 
 function renderList(stats){
-  var filtered=students;
-  if(currentFilter==='filled')filtered=students.filter(function(s){return s.has_filled;});
-  if(currentFilter==='missing')filtered=students.filter(function(s){return !s.has_filled;});
+  var filtered=students;if(currentFilter==='filled')filtered=students.filter(function(s){return s.has_filled;});if(currentFilter==='missing')filtered=students.filter(function(s){return !s.has_filled;});
+  var filledCount=students.filter(function(s){return s.has_filled;}).length;var missingCount=students.length-filledCount;
 
-  var rows='';
-  filtered.forEach(function(s){
-    var filled=s.has_filled;
-    rows+='<tr class="'+(s.suspect?'suspect-row':'')+'"><td>'+esc(s.first_name)+' '+(s.full_name||'')+'</td><td>'+esc(s.email)+'</td><td><span class="status-dot '+(filled?'status-filled':'status-missing')+'"></span>'+(filled?'Rempli':'Manquant')+'</td><td><a onclick="showDetail(\''+s.id+'\')">Voir →</a></td></tr>';
-  });
+  var rows='';filtered.forEach(function(s){var f=s.has_filled;rows+='<tr class="'+(s.suspect?'suspect-row':'')+'"><td>'+esc(s.first_name)+' '+(s.full_name||'')+'</td><td style="font-size:11px">'+esc(s.email)+'</td><td><span class="status-dot '+(f?'status-filled':'status-missing')+'"></span>'+(f?'Rempli':'Manquant')+'</td><td><a onclick="showDetail(\''+s.id+'\')">Voir →</a></td></tr>';});
 
-  var filledCount=students.filter(function(s){return s.has_filled;}).length;
-  var missingCount=students.length-filledCount;
-
-  document.getElementById('app').innerHTML='<div class="app-c">'+
-    '<header class="admin-header">'+
-      '<div class="app-brand">Tracking Coach</div>'+
-      '<span class="badge-coach">🔐 Coach</span>'+
-      '<span style="flex:1"></span>'+
-      '<a class="nav-link" href="index.html">← Élève</a>'+
-      '<button class="refresh-btn" onclick="load()">↻</button>'+
-    '</header>'+
-    '<h1 class="page-id">Mes <em>élèves</em></h1>'+
-    '<div class="kpi-bar">'+
-      '<div class="kpi-card"><div class="kpi-num">'+(stats.total||0)+'</div><div class="kpi-label">Total</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num">'+filledCount+'</div><div class="kpi-label">Remplis</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num">'+missingCount+'</div><div class="kpi-label">Manquants</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num">'+(stats.ca_total||0).toFixed(0)+'€</div><div class="kpi-label">CA jour</div></div>'+
-    '</div>'+
-    '<div class="filter-bar">'+
-      '<button class="filter-pill'+(currentFilter==='all'?' active':'')+'" onclick="setFilter(\'all\')">Tous<span class="count">'+(stats.total||0)+'</span></button>'+
-      '<button class="filter-pill'+(currentFilter==='filled'?' active':'')+'" onclick="setFilter(\'filled\')">Remplis<span class="count">'+filledCount+'</span></button>'+
-      '<button class="filter-pill'+(currentFilter==='missing'?' active':'')+'" onclick="setFilter(\'missing\')">Manquants<span class="count">'+missingCount+'</span></button>'+
-    '</div>'+
-    '<h2 class="section-title">Liste</h2>'+
+  document.getElementById('app').innerHTML='<div class="app"><div class="app-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><a class="nav-link" href="index.html">← Élève</a><button class="refresh-btn" onclick="load()">↻</button></div><div class="app-main">'+
+    '<div class="page-id"><h1>Mes <em>élèves</em></h1></div>'+
+    '<div class="kpi-bar"><div class="kpi-card"><div class="kpi-num">'+(stats.total||0)+'</div><div class="kpi-label">Total</div></div><div class="kpi-card"><div class="kpi-num">'+filledCount+'</div><div class="kpi-label">Remplis</div></div><div class="kpi-card"><div class="kpi-num">'+missingCount+'</div><div class="kpi-label">Manquants</div></div><div class="kpi-card"><div class="kpi-num">0</div><div class="kpi-label">Suspects</div></div><div class="kpi-card"><div class="kpi-num">'+(stats.ca_total||0).toFixed(0)+'€</div><div class="kpi-label">CA jour</div></div></div>'+
+    '<div class="filter-bar"><button class="filter-pill'+(currentFilter==='all'?' active':'')+'" onclick="setFilter(\'all\')">Tous<span class="count">'+(stats.total||0)+'</span></button><button class="filter-pill'+(currentFilter==='filled'?' active':'')+'" onclick="setFilter(\'filled\')">Remplis<span class="count">'+filledCount+'</span></button><button class="filter-pill'+(currentFilter==='missing'?' active':'')+'" onclick="setFilter(\'missing\')">Manquants<span class="count">'+missingCount+'</span></button></div>'+
+    '<div class="section-title">Liste</div>'+
     (students.length>0?'<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd\'hui</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty-state">✨ Aucun élève — ils apparaîtront ici après leur première connexion</div>')+
-  '</div>';
-  bindNav();
+  '</div></div>';
 }
 
-function setFilter(f){
-  currentFilter=f;load();
-}
+function setFilter(f){currentFilter=f;load();}
 
 async function showDetail(id){
-  document.getElementById('app').innerHTML='<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
-  var res=await fetch(API+'/students/'+id);
-  var data=await res.json();
+  document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px;font-family:var(--serif);font-style:italic;color:var(--ink-4);position:relative;z-index:1">Chargement...</div>';
+  var res=await fetch(API+'/students/'+id);var data=await res.json();
   var s=data.student,entries=data.entries||[],audit=data.audit||[];
 
-  // Entry rows (last 14)
-  var entryRows='';
-  entries.slice(0,14).forEach(function(e){
-    entryRows+='<tr><td>'+e.entry_date+'</td><td>'+e.calls+'</td><td>'+e.dm+'</td><td>'+e.videos+'</td><td>'+(e.live?'Oui':'—')+'</td><td>'+(e.ca_eur||0).toFixed(2)+'€</td><td><strong>'+(e.calls*2+e.dm+e.videos*3+(e.live?5:0))+'</strong></td></tr>';
-  });
+  var entryRows='';entries.slice(0,14).forEach(function(e){entryRows+='<tr><td>'+e.entry_date+'</td><td>'+e.calls+'</td><td>'+e.dm+'</td><td>'+e.videos+'</td><td>'+(e.live?'Oui':'—')+'</td><td>'+(e.ca_eur||0).toFixed(2)+'€</td><td><strong>'+(e.calls*2+e.dm+e.videos*3+(e.live?5:0))+'</strong></td></tr>';});
 
   // 30-day grid
-  var dayGrid='';
-  var today=new Date().toISOString().slice(0,10);
-  var entryMap={};
-  entries.forEach(function(e){entryMap[e.entry_date]=e;});
-  for(var i=29;i>=0;i--){
-    var d=new Date();d.setDate(d.getDate()-i);
-    var ds=d.toISOString().slice(0,10);
-    var entry=entryMap[ds];
-    var cls='day-cell';
-    if(ds===today)cls+=' day-today';
-    if(entry){
-      if(entry.created_at!==entry.updated_at)cls+=' day-modified';
-      else cls+=' day-filled';
-    }else if(ds>today){
-      cls+=' day-future';
-    }else{
-      cls+=' day-missed';
-    }
-    dayGrid+='<div class="'+cls+'" title="'+ds+'">'+d.getDate()+'</div>';
-  }
+  var dayGrid='';var today=new Date().toISOString().slice(0,10);var em={};entries.forEach(function(e){em[e.entry_date]=e;});
+  for(var i=29;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var ds=d.toISOString().slice(0,10);var entry=em[ds];var cls='day-cell';if(ds===today)cls+=' day-today';if(entry){if(entry.created_at!==entry.updated_at)cls+=' day-modified';else cls+=' day-filled';}else if(ds>today){cls+=' day-future';}else{cls+=' day-missed';}dayGrid+='<div class="'+cls+'" title="'+ds+'">'+d.getDate()+'</div>';}
 
-  // Audit log
-  var auditHtml='';
-  audit.forEach(function(a){
-    var ts=(a.performed_at||'').slice(0,19);
-    var cls=a.action==='UPDATE'?'update':'';
-    auditHtml+='<div class="audit-line '+cls+'">'+ts+' ['+a.action+'] '+a.entry_date+'</div>';
-  });
+  var auditHtml='';audit.forEach(function(a){var ts=(a.performed_at||'').slice(0,19);var cls=a.action==='UPDATE'?'update':'';auditHtml+='<div class="audit-line '+cls+'">'+ts+' ['+a.action+'] '+a.entry_date+'</div>';});
 
-  // Stats
-  var totalPts=entries.reduce(function(s,e){return s+e.calls*2+e.dm+e.videos*3+(e.live?5:0);},0);
-  var totalCA=entries.reduce(function(s,e){return s+(e.ca_eur||0);},0);
-  var liveDays=entries.filter(function(e){return e.live;}).length;
-  var missed7=0;for(var i=0;i<7;i++){var dd=new Date();dd.setDate(dd.getDate()-i);var dds=dd.toISOString().slice(0,10);if(!entryMap[dds]&&dds<=today)missed7++;}
-  var suspect=missed7>=3;
+  var totalPts=entries.reduce(function(s,e){return s+e.calls*2+e.dm+e.videos*3+(e.live?5:0);},0);var totalCA=entries.reduce(function(s,e){return s+(e.ca_eur||0);},0);var liveDays=entries.filter(function(e){return e.live;}).length;var missed7=0;for(var i=0;i<7;i++){var dd=new Date();dd.setDate(dd.getDate()-i);if(!em[dd.toISOString().slice(0,10)]&&dd.toISOString().slice(0,10)<=today)missed7++;}
 
-  document.getElementById('app').innerHTML='<div class="app-c">'+
-    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><a class="btn-back" onclick="load()">← Retour</a></header>'+
-    (suspect?'<div class="suspect-banner">⚠️ Élève suspect : '+missed7+' oublis sur 7 jours</div>':'')+
-    '<h1 class="page-id" style="font-size:clamp(24px,4vw,36px)">'+s.first_name+' <em>'+(s.full_name||'')+'</em></h1>'+
-    '<p style="color:var(--ink-3);margin-bottom:16px">'+s.email+' · Inscrit le '+(s.joined_at||'').slice(0,10)+'</p>'+
-    '<div class="kpi-bar" style="grid-template-columns:repeat(4,1fr)">'+
-      '<div class="kpi-card"><div class="kpi-num">'+totalPts+'</div><div class="kpi-label">Points 90j</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num">'+totalCA.toFixed(0)+'€</div><div class="kpi-label">CA cumulé</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num">'+liveDays+'</div><div class="kpi-label">Lives 30j</div></div>'+
-      '<div class="kpi-card"><div class="kpi-num" style="color:'+(missed7>0?'var(--blood)':'var(--ink)')+'">'+missed7+'</div><div class="kpi-label">Manqués 7j</div></div>'+
-    '</div>'+
-    '<h2 class="section-title">Grille 30 jours</h2>'+
-    '<div class="day-grid">'+dayGrid+'</div>'+
-    '<div class="legend">'+
-      '<span><span class="dot" style="background:var(--ember)"></span>Rempli</span>'+
-      '<span><span class="dot" style="background:var(--line)"></span>Manqué</span>'+
-      '<span><span class="dot" style="background:var(--gold)"></span>Modifié rétro</span>'+
-    '</div>'+
-    '<h2 class="section-title">Fiches récentes</h2>'+
-    (entryRows?'<div class="table-wrap"><table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead><tbody>'+entryRows+'</tbody></table></div>':'<div class="empty-state">Aucune fiche</div>')+
-    '<h2 class="section-title">Audit log</h2>'+
-    '<div class="audit-log">'+(auditHtml||'Aucune modification')+'</div>'+
-  '</div>';
-  bindNav();
+  document.getElementById('app').innerHTML='<div class="app"><div class="app-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="btn-back" onclick="load()">← Retour</button></div><div class="app-main">'+
+    (missed7>=3?'<div class="suspect-banner">⚠️ Suspect : '+missed7+' oublis sur 7 jours — à vérifier</div>':'')+
+    '<div class="page-id"><h1 style="font-size:clamp(26px,4vw,38px)">'+esc(s.first_name)+' <em>'+(s.full_name||'')+'</em></h1></div>'+
+    '<p style="color:var(--ink-3);margin-bottom:16px;font-family:var(--mono);font-size:11px">'+esc(s.email)+' · Inscrit le '+(s.joined_at||'').slice(0,10)+'</p>'+
+    '<div class="kpi-bar" style="grid-template-columns:repeat(4,1fr)"><div class="kpi-card"><div class="kpi-num">'+totalPts+'</div><div class="kpi-label">Points 90j</div></div><div class="kpi-card"><div class="kpi-num">'+totalCA.toFixed(0)+'€</div><div class="kpi-label">CA cumulé</div></div><div class="kpi-card"><div class="kpi-num">'+liveDays+'</div><div class="kpi-label">Lives 30j</div></div><div class="kpi-card"><div class="kpi-num" style="color:'+(missed7>0?'var(--blood)':'var(--ink)')+'">'+missed7+'</div><div class="kpi-label">Manqués 7j</div></div></div>'+
+    '<div class="section-title">Grille 30 jours</div><div class="day-grid">'+dayGrid+'</div><div class="legend"><span><span class="dot" style="background:var(--ember)"></span>Rempli</span><span><span class="dot" style="background:rgba(26,22,20,.08)"></span>Manqué</span><span><span class="dot" style="background:var(--gold)"></span>Modifié</span></div>'+
+    '<div class="section-title">Fiches récentes</div>'+(entryRows?'<div class="table-wrap"><table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vid</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead><tbody>'+entryRows+'</tbody></table></div>':'<div class="empty-state">Aucune fiche</div>')+
+    '<div class="section-title">Audit log</div><div class="audit-log">'+(auditHtml||'Aucune modification enregistrée')+'</div>'+
+  '</div></div>';
 }
 
 function renderMissing(){
   var missing=students.filter(function(s){return !s.has_filled;});
-  document.getElementById('app').innerHTML='<div class="app-c">'+
-    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderMissing()">↻</button></header>'+
-    '<h1 class="page-id">Man<em>quants</em></h1>'+
-    '<p style="color:var(--ink-3);margin-bottom:16px">N\'ont pas rempli leur fiche aujourd\'hui</p>'+
-    (missing.length>0?missing.map(function(s){
-      return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);background:var(--paper-soft);margin-bottom:4px;border-radius:var(--r-sm)">'+
-        '<span style="font-size:20px">⚠️</span>'+
-        '<div><strong>'+s.first_name+' '+(s.full_name||'')+'</strong><br><span style="font-size:12px;color:var(--ink-4)">'+s.email+'</span></div>'+
-        '<span style="margin-left:auto"><a onclick="showDetail(\''+s.id+'\')">Voir →</a></span>'+
-      '</div>';
-    }).join(''):'<div class="empty-state">✅ Tout le monde a rempli sa fiche !</div>')+
-  '</div>';
-  bindNav();
+  document.getElementById('app').innerHTML='<div class="app"><div class="app-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderMissing()">↻</button></div><div class="app-main">'+
+    '<div class="page-id"><h1>Man<em>quants</em></h1></div><p style="color:var(--ink-3);margin-bottom:16px;font-family:var(--serif);font-style:italic">N\'ont pas rempli aujourd\'hui</p>'+
+    (missing.length>0?missing.map(function(s){return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid rgba(26,22,20,.06);background:rgba(255,252,245,.5);margin-bottom:4px"><span style="font-size:18px">⚠️</span><div><strong>'+esc(s.first_name)+' '+(s.full_name||'')+'</strong><br><span style="font-size:11px;color:var(--ink-4)">'+esc(s.email)+'</span></div><span style="margin-left:auto"><a onclick="showDetail(\''+s.id+'\')">Voir →</a></span></div>';}).join(''):'<div class="empty-state">✅ Tout le monde a rempli sa fiche !</div>')+
+  '</div></div>';
 }
 
-function renderAuditOverview(){
-  document.getElementById('app').innerHTML='<div class="app-c">'+
-    '<header class="admin-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderAuditOverview()">↻</button></header>'+
-    '<h1 class="page-id">Piste d\'<em>audit</em></h1>'+
-    '<p style="color:var(--ink-3);margin-bottom:16px">Dernières modifications détectées</p>'+
-    '<div class="audit-log" style="max-height:500px">Chargement...</div>'+
-  '</div>';
+async function renderAuditOverview(){
+  document.getElementById('app').innerHTML='<div class="app"><div class="app-header"><div class="app-brand">Tracking Coach</div><span class="badge-coach">🔐 Coach</span><span style="flex:1"></span><button class="refresh-btn" onclick="renderAuditOverview()">↻</button></div><div class="app-main">'+
+    '<div class="page-id"><h1>Piste d\'<em>audit</em></h1></div><div class="audit-log" style="max-height:500px">Chargement...</div></div></div>';
 
-  // Fetch audit data for all students
-  Promise.all(students.map(async function(s){
-    var res=await fetch(API+'/students/'+s.id);
-    var data=await res.json();
-    return {student:s,audit:data.audit||[]};
-  })).then(function(results){
-    var allAudit=[];
-    results.forEach(function(r){
-      r.audit.forEach(function(a){
-        allAudit.push({student:r.student.first_name+' '+(r.student.full_name||''),action:a.action,date:a.entry_date,ts:a.performed_at});
-      });
-    });
-    allAudit.sort(function(a,b){return (b.ts||'')>(a.ts||'')?1:-1;});
-    var html=allAudit.slice(0,100).map(function(a){
-      return '<div class="audit-line'+(a.action==='UPDATE'?' update':'')+'">'+(a.ts||'').slice(0,19)+' ['+a.action+'] '+esc(a.student)+' · '+a.date+'</div>';
-    }).join('');
-    document.querySelector('.audit-log').innerHTML=html||'Aucune modification enregistrée';
+  Promise.all(students.map(async function(s){var res=await fetch(API+'/students/'+s.id);var data=await res.json();return {student:s,audit:data.audit||[]};})).then(function(results){
+    var all=[];results.forEach(function(r){r.audit.forEach(function(a){all.push({name:r.student.first_name+' '+(r.student.full_name||''),action:a.action,date:a.entry_date,ts:a.performed_at});});});
+    all.sort(function(a,b){return (b.ts||'')>(a.ts||'')?1:-1;});
+    document.querySelector('.audit-log').innerHTML=all.slice(0,100).map(function(a){return '<div class="audit-line'+(a.action==='UPDATE'?' update':'')+'">'+(a.ts||'').slice(0,19)+' ['+a.action+'] '+esc(a.name)+' · '+a.date+'</div>';}).join('')||'Aucune modification enregistrée';
   });
 }
 
