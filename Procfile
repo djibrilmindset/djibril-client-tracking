@@ -1,1 +1,1 @@
-web: python server_forge.py
+web: python server.py

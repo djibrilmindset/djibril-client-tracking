@@ -1,11 +1,11 @@
 services:
   - type: web
     name: djibril-tracking
-    env: python
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python server_forge.py
+    startCommand: python server.py
     envVars:
       - key: PORT
-        value: 10000
+        value: 8765
       - key: TOKEN_SECRET
-        generateValue: true
+        value: djibril-tracking-secret-2026
