@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coach · Djibril Tracking</title>
-<link rel="stylesheet" href="/forge.css">
+<link rel="stylesheet" href="forge.css">
 <style>
   .app-c { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1 }
   .admin-header { display:flex; align-items:center; gap:14px; padding:18px 0; border-bottom:1px solid var(--line); margin-bottom:24px; position:sticky; top:0; background:rgba(246,241,232,0.92); backdrop-filter:blur(14px); z-index:50 }
@@ -40,7 +40,7 @@
 <div id="app"><div class="app-c" style="text-align:center;padding:80px">Chargement...</div></div>
 
 <script>
-const API = window.location.origin + '/api/coach';
+const API = './api/coach';
 let students = [];
 
 async function load() {

@@ -1,14 +1,13 @@
-// Supabase Edge Function: Tracking Djibril v3
+// Supabase Edge Function: Tracking Djibril v4 (fixed paths)
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-
 const STUDENT_HTML = `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tracking · Djibril</title>
-<link rel="stylesheet" href="/forge.css">
+<link rel="stylesheet" href="forge.css">
 <style>
   .login-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:1 }
   .login-card { background:var(--paper-soft); border:1px solid var(--line-strong); border-radius:var(--r-lg); padding:48px 40px; width:100%; max-width:440px; box-shadow:var(--shadow-2); text-align:center }
@@ -63,7 +62,7 @@ const STUDENT_HTML = `<!DOCTYPE html>
 <div id="app"></div>
 
 <script>
-const API = window.location.origin + '/api';
+const API = './api';
 let currentUser = null;
 
 async function login(email, firstName, lastName) {
@@ -267,7 +266,7 @@ const COACH_HTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coach · Djibril Tracking</title>
-<link rel="stylesheet" href="/forge.css">
+<link rel="stylesheet" href="forge.css">
 <style>
   .app-c { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1 }
   .admin-header { display:flex; align-items:center; gap:14px; padding:18px 0; border-bottom:1px solid var(--line); margin-bottom:24px; position:sticky; top:0; background:rgba(246,241,232,0.92); backdrop-filter:blur(14px); z-index:50 }
@@ -303,7 +302,7 @@ const COACH_HTML = `<!DOCTYPE html>
 <div id="app"><div class="app-c" style="text-align:center;padding:80px">Chargement...</div></div>
 
 <script>
-const API = window.location.origin + '/api/coach';
+const API = './api/coach';
 let students = [];
 
 async function load() {
@@ -3354,111 +3353,24 @@ body {
   .kpi__val { font-size: 28px; }
 }
 `;
-
-const CORS = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type"};
-const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const TOKEN_SECRET = Deno.env.get("TOKEN_SECRET") || "djibril-tracking-secret-2026";
-
-function generateToken(sid: string): string {
-  const p = btoa(JSON.stringify({sid, exp: Date.now()+30*86400000}));
-  const sig = btoa([...new Uint8Array(new TextEncoder().encode(p+TOKEN_SECRET))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40));
-  return p+"."+sig;
-}
-function verifyToken(t: string): string|null {
-  try {
-    const [b64,sig] = t.split(".");
-    if(!b64||!sig) return null;
-    const expected = btoa([...new Uint8Array(new TextEncoder().encode(b64+TOKEN_SECRET))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40));
-    if(sig!==expected) return null;
-    const p = JSON.parse(atob(b64));
-    return p.exp < Date.now() ? null : p.sid;
-  } catch { return null; }
-}
-
-async function fc(email:string,fn:string,ln:string){
-  email=email.toLowerCase().trim();
-  const{data:e}=await sb.from("students").select("*").eq("email",email).maybeSingle();
-  if(e)return e;
-  const{data:c}=await sb.from("students").insert({email,first_name:fn,full_name:ln}).select().single();
-  return c;
-}
-
-async function hr(req:Request):Promise<Response>{
-  const u=new URL(req.url);
-  let p=u.pathname;
-  const m=req.method;
-  if(m==="OPTIONS")return new Response(null,{headers:CORS});
-  if(p.startsWith("/tracking-app"))p=p.slice("/tracking-app".length)||"/";
-  
-  if(p==="/forge.css")return new Response(FORGE_CSS,{headers:{...CORS,"Content-Type":"text/css"}});
-  if(p==="/"||p==="/student"||p==="/app")return new Response(STUDENT_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
-  if(p==="/coach"||p==="/admin")return new Response(COACH_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
-  
-  if(p==="/api/coach/students"&&m==="GET"){
-    const{data:s}=await sb.from("students").select("*").order("joined_at",{ascending:false});
-    const td=new Date().toISOString().slice(0,10);
-    const{data:e}=await sb.from("daily_entries").select("*").eq("entry_date",td);
-    const em:Record<string,any>={};
-    (e||[]).forEach((x:any)=>{em[x.student_id]=x});
-    return Response.json((s||[]).map((x:any)=>({...x,has_filled:!!em[x.id],today_entry:em[x.id]||null})),{headers:CORS});
-  }
-  
-  if(p==="/api/coach/stats"&&m==="GET"){
-    const{count:t}=await sb.from("students").select("*",{count:"exact",head:true});
-    const td=new Date().toISOString().slice(0,10);
-    const{count:f}=await sb.from("daily_entries").select("*",{count:"exact",head:true}).eq("entry_date",td);
-    const{data:cd}=await sb.from("daily_entries").select("ca_eur").eq("entry_date",td);
-    const ca=(cd||[]).reduce((s:number,x:any)=>s+(x.ca_eur||0),0);
-    return Response.json({total:t||0,filled:f||0,missing:(t||0)-(f||0),ca_total:Math.round(ca*100)/100},{headers:CORS});
-  }
-  
-  const dm=p.match(/^\/api\/coach\/students\/([a-f0-9-]+)$/);
-  if(dm&&m==="GET"){
-    const{data:s}=await sb.from("students").select("*").eq("id",dm[1]).single();
-    const{data:e}=await sb.from("daily_entries").select("*").eq("student_id",dm[1]).order("entry_date",{ascending:false}).limit(30);
-    const{data:a}=await sb.from("entry_audit").select("*").eq("student_id",dm[1]).order("performed_at",{ascending:false}).limit(50);
-    return Response.json({student:s,entries:e||[],audit:a||[]},{headers:CORS});
-  }
-  
-  if(p==="/api/auth"&&m==="POST"){
-    const{email,firstName,lastName}=await req.json();
-    if(!email||!firstName||!lastName)return Response.json({error:"Email, prenom et nom requis"},{status:400,headers:CORS});
-    const s=await fc(email,firstName,lastName);
-    return Response.json({token:generateToken(s.id),student:s},{headers:CORS});
-  }
-  
-  const ah=req.headers.get("Authorization");
-  let sid:string|null=null;
-  if(ah?.startsWith("Bearer "))sid=verifyToken(ah.slice(7));
-  
-  if(p.startsWith("/api/")&&!p.startsWith("/api/coach/")){
-    if(!sid)return Response.json({error:"Non autorise"},{status:401,headers:CORS});
-    
-    if(p==="/api/me/today"&&m==="GET"){
-      const td=new Date().toISOString().slice(0,10);
-      const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).eq("entry_date",td).maybeSingle();
-      if(d)return Response.json(d,{headers:CORS});
-      const{data:c}=await sb.from("daily_entries").insert({student_id:sid,entry_date:td,calls:0,dm:0,videos:0,live:false,ca_eur:0}).select().single();
-      return Response.json(c,{headers:CORS});
-    }
-    
-    if(p==="/api/me/history"&&m==="GET"){
-      const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).order("entry_date",{ascending:false}).limit(30);
-      return Response.json(d||[],{headers:CORS});
-    }
-    
-    const em=p.match(/^\/api\/me\/entries\/(\d{4}-\d{2}-\d{2})$/);
-    if(em&&m==="PUT"){
-      const ed=em[1];
-      const tda=new Date();tda.setDate(tda.getDate()-3);
-      if(new Date(ed)<new Date(tda.toISOString().slice(0,10)))return Response.json({error:"3 jours max"},{status:400,headers:CORS});
-      const b=await req.json();
-      const{data:d}=await sb.from("daily_entries").upsert({student_id:sid,entry_date:ed,calls:b.calls||0,dm:b.dm||0,videos:b.videos||0,live:b.live||false,ca_eur:b.ca_eur||0},{onConflict:"student_id, entry_date"}).select().single();
-      return Response.json(d,{headers:CORS});
-    }
-  }
-  
-  return new Response("Not Found",{status:404,headers:CORS});
-}
-
+const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type"};
+const sb=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+const TS=Deno.env.get("TOKEN_SECRET")||"djibril-tracking-secret-2026";
+function gt(sid:string):string{const p=btoa(JSON.stringify({sid,exp:Date.now()+30*86400000}));return p+"."+btoa([...new Uint8Array(new TextEncoder().encode(p+TS))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40))}
+function vt(t:string):string|null{try{const[b64,sig]=t.split(".");if(!b64||!sig)return null;const e=btoa([...new Uint8Array(new TextEncoder().encode(b64+TS))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40));if(sig!==e)return null;const p=JSON.parse(atob(b64));return p.exp<Date.now()?null:p.sid}catch{return null}}
+async function fc(e:string,n:string,l:string){e=e.toLowerCase().trim();const{data:x}=await sb.from("students").select("*").eq("email",e).maybeSingle();if(x)return x;const{data:c}=await sb.from("students").insert({email:e,first_name:n,full_name:l}).select().single();return c}
+async function hr(req:Request):Promise<Response>{const u=new URL(req.url);let p=u.pathname;const m=req.method;if(m==="OPTIONS")return new Response(null,{headers:CORS});if(p.startsWith("/tracking-app"))p=p.slice("/tracking-app".length)||"/";
+if(p==="/forge.css")return new Response(FORGE_CSS,{headers:{...CORS,"Content-Type":"text/css"}});
+if(p==="/"||p==="/student"||p==="/app")return new Response(STUDENT_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
+if(p==="/coach"||p==="/admin")return new Response(COACH_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
+if(p==="/api/coach/students"&&m==="GET"){const{data:s}=await sb.from("students").select("*").order("joined_at",{ascending:false});const td=new Date().toISOString().slice(0,10);const{data:e}=await sb.from("daily_entries").select("*").eq("entry_date",td);const em:Record<string,any>={};(e||[]).forEach((x:any)=>{em[x.student_id]=x});return Response.json((s||[]).map((x:any)=>({...x,has_filled:!!em[x.id],today_entry:em[x.id]||null})),{headers:CORS})}
+if(p==="/api/coach/stats"&&m==="GET"){const{count:t}=await sb.from("students").select("*",{count:"exact",head:true});const td=new Date().toISOString().slice(0,10);const{count:f}=await sb.from("daily_entries").select("*",{count:"exact",head:true}).eq("entry_date",td);const{data:cd}=await sb.from("daily_entries").select("ca_eur").eq("entry_date",td);const ca=(cd||[]).reduce((s:number,x:any)=>s+(x.ca_eur||0),0);return Response.json({total:t||0,filled:f||0,missing:(t||0)-(f||0),ca_total:Math.round(ca*100)/100},{headers:CORS})}
+const dm=p.match(/^\/api\/coach\/students\/([a-f0-9-]+)$/);if(dm&&m==="GET"){const{data:s}=await sb.from("students").select("*").eq("id",dm[1]).single();const{data:e}=await sb.from("daily_entries").select("*").eq("student_id",dm[1]).order("entry_date",{ascending:false}).limit(30);const{data:a}=await sb.from("entry_audit").select("*").eq("student_id",dm[1]).order("performed_at",{ascending:false}).limit(50);return Response.json({student:s,entries:e||[],audit:a||[]},{headers:CORS})}
+if(p==="/api/auth"&&m==="POST"){const{email,firstName,lastName}=await req.json();if(!email||!firstName||!lastName)return Response.json({error:"Email, prenom et nom requis"},{status:400,headers:CORS});const s=await fc(email,firstName,lastName);return Response.json({token:gt(s.id),student:s},{headers:CORS})}
+const ah=req.headers.get("Authorization");let sid:string|null=null;if(ah?.startsWith("Bearer "))sid=vt(ah.slice(7));
+if(p.startsWith("/api/")&&!p.startsWith("/api/coach/")){if(!sid)return Response.json({error:"Non autorise"},{status:401,headers:CORS});
+if(p==="/api/me/today"&&m==="GET"){const td=new Date().toISOString().slice(0,10);const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).eq("entry_date",td).maybeSingle();if(d)return Response.json(d,{headers:CORS});const{data:c}=await sb.from("daily_entries").insert({student_id:sid,entry_date:td,calls:0,dm:0,videos:0,live:false,ca_eur:0}).select().single();return Response.json(c,{headers:CORS})}
+if(p==="/api/me/history"&&m==="GET"){const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).order("entry_date",{ascending:false}).limit(30);return Response.json(d||[],{headers:CORS})}
+const em=p.match(/^\/api\/me\/entries\/(\d{4}-\d{2}-\d{2})$/);if(em&&m==="PUT"){const ed=em[1];const tda=new Date();tda.setDate(tda.getDate()-3);if(new Date(ed)<new Date(tda.toISOString().slice(0,10)))return Response.json({error:"3 jours max"},{status:400,headers:CORS});const b=await req.json();const{data:d}=await sb.from("daily_entries").upsert({student_id:sid,entry_date:ed,calls:b.calls||0,dm:b.dm||0,videos:b.videos||0,live:b.live||false,ca_eur:b.ca_eur||0},{onConflict:"student_id, entry_date"}).select().single();return Response.json(d,{headers:CORS})}}
+return new Response("Not Found",{status:404,headers:CORS});}
 serve(hr);

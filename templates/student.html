@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tracking · Djibril</title>
-<link rel="stylesheet" href="/forge.css">
+<link rel="stylesheet" href="forge.css">
 <style>
   .login-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:1 }
   .login-card { background:var(--paper-soft); border:1px solid var(--line-strong); border-radius:var(--r-lg); padding:48px 40px; width:100%; max-width:440px; box-shadow:var(--shadow-2); text-align:center }
@@ -59,7 +59,7 @@
 <div id="app"></div>
 
 <script>
-const API = window.location.origin + '/api';
+const API = './api';
 let currentUser = null;
 
 async function login(email, firstName, lastName) {
