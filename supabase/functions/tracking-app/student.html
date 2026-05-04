@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracking · Djibril</title>
+<link rel="stylesheet" href="/forge.css">
+<style>
+  .login-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:1 }
+  .login-card { background:var(--paper-soft); border:1px solid var(--line-strong); border-radius:var(--r-lg); padding:48px 40px; width:100%; max-width:440px; box-shadow:var(--shadow-2); text-align:center }
+  .login-card h1 { font-family:var(--font-display); font-size:clamp(28px,4vw,40px); color:var(--ink); margin-bottom:8px; letter-spacing:-0.5px }
+  .login-card h1 em { font-style:italic; background:var(--grad-ember); -webkit-background-clip:text; -webkit-text-fill-color:transparent }
+  .login-card p.sub { color:var(--ink-3); font-size:14px; margin-bottom:32px }
+  .field { margin-bottom:18px; text-align:left }
+  .field label { display:block; font-size:11px; font-weight:600; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px }
+  .field input { width:100%; padding:12px 16px; border:1px solid var(--line-strong); border-radius:var(--r-sm); font-size:16px; font-family:var(--font-body); background:var(--paper); color:var(--ink); outline:none; transition:border .2s }
+  .field input:focus { border-color:var(--ember); box-shadow:0 0 0 3px var(--ember-soft) }
+  .btn-enter { width:100%; padding:14px; background:var(--grad-ember); color:#fff; border:none; border-radius:var(--r-sm); font-size:16px; font-weight:600; cursor:pointer; transition:transform .15s,box-shadow .15s; margin-top:8px }
+  .btn-enter:hover { transform:translateY(-1px); box-shadow:var(--shadow-glow) }
+  .error-msg { background:var(--blood-soft); color:var(--blood); padding:12px; border-radius:var(--r-sm); font-size:13px; margin-bottom:16px }
+  .success-msg { background:rgba(39,166,68,0.1); color:#27a644; padding:12px; border-radius:var(--r-sm); font-size:14px; margin-bottom:16px; text-align:center }
+  .sub-info { margin-top:20px; font-size:12px; color:var(--ink-4) }
+  .app { position:relative; z-index:1; min-height:100vh; background:transparent }
+  .app-header { display:flex; align-items:center; justify-content:space-between; padding:20px 32px; border-bottom:1px solid var(--line); background:rgba(246,241,232,0.92); backdrop-filter:blur(14px); position:sticky; top:0; z-index:50 }
+  .app-brand { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--ink); letter-spacing:-0.3px }
+  .user-chip { display:flex; align-items:center; gap:10px; font-size:14px; color:var(--ink-2); cursor:pointer; padding:6px 14px; border-radius:var(--r-pill); background:var(--ember-soft); border:none }
+  .app-main { max-width:680px; margin:0 auto; padding:40px 24px }
+  .page-id { font-family:var(--font-serif); font-size:clamp(40px,6vw,72px); font-style:italic; color:var(--ink); margin-bottom:8px }
+  .page-id em { color:var(--ember) }
+  .today-date { font-size:14px; color:var(--ink-3); margin-bottom:32px }
+  .card-today { background:var(--paper-soft); border:2px solid var(--ember); border-radius:var(--r-lg); padding:32px; box-shadow:var(--shadow-2) }
+  .badge-pulse { display:inline-flex; align-items:center; gap:6px; background:var(--ember-soft); color:var(--ember); padding:4px 12px; border-radius:var(--r-pill); font-size:12px; font-weight:600; margin-bottom:20px }
+  .badge-pulse::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--ember); animation:pulse-dot 1.5s ease-in-out infinite }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .card-today h2 { font-family:var(--font-display); font-size:22px; color:var(--ink); margin-bottom:24px }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px }
+  @media(max-width:500px){ .field-row{grid-template-columns:1fr} }
+  .field-row .field input { text-align:center; font-size:18px; font-weight:600 }
+  .live-toggle { display:flex; align-items:center; gap:10px; margin:12px 0 24px }
+  .live-toggle button { padding:8px 20px; border-radius:var(--r-pill); border:2px solid var(--line-strong); background:var(--paper); color:var(--ink-3); cursor:pointer; font-weight:600; font-size:14px; transition:all .2s }
+  .live-toggle button.active { background:var(--blood); border-color:var(--blood); color:#fff }
+  .btn-save { width:100%; padding:14px; background:var(--grad-ember); color:#fff; border:none; border-radius:var(--r-sm); font-size:16px; font-weight:600; cursor:pointer }
+  .btn-save:disabled { opacity:0.5; cursor:not-allowed }
+  .recap { margin-top:32px }
+  .recap h3 { font-family:var(--font-display); font-size:18px; color:var(--ink); margin-bottom:16px }
+  .recap-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line) }
+  .recap-label { font-weight:500; color:var(--ink-2) }
+  .recap-value { font-weight:700; color:var(--ink) }
+  .recap-points { margin-top:16px; text-align:right; font-family:var(--font-display); font-size:40px; font-weight:700; color:var(--ember) }
+  .history-section { margin-top:48px }
+  .history-section h3 { font-family:var(--font-display); font-size:18px; color:var(--ink); margin-bottom:16px }
+  .history-table { width:100%; border-collapse:collapse; font-size:13px }
+  .history-table th { text-align:left; padding:8px 12px; font-size:11px; font-weight:600; color:var(--ink-4); text-transform:uppercase; border-bottom:1px solid var(--line-strong); background:var(--paper-soft) }
+  .history-table td { padding:8px 12px; border-bottom:1px solid var(--line) }
+</style>
+</head>
+<body>
+<div class="cosmos" aria-hidden="true"></div>
+<div id="app"></div>
+
+<script>
+const API = window.location.origin + '/api';
+let currentUser = null;
+
+async function login(email, firstName, lastName) {
+  const res = await fetch(API + '/auth', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email, firstName, lastName})
+  });
+  if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Erreur'); }
+  const data = await res.json();
+  localStorage.setItem('dj_token', data.token);
+  localStorage.setItem('dj_user', JSON.stringify(data.student));
+  currentUser = data.student;
+  render();
+}
+
+function logout() {
+  localStorage.removeItem('dj_token');
+  localStorage.removeItem('dj_user');
+  currentUser = null;
+  render();
+}
+
+async function apiCall(method, path, body) {
+  const h = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + localStorage.getItem('dj_token')
+  };
+  const opts = { method, headers: h };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (res.status === 401) { logout(); return null; }
+  return res.json();
+}
+
+function render() {
+  const root = document.getElementById('app');
+  if (!currentUser) { root.innerHTML = renderLogin(); bindLoginEvents(); }
+  else { root.innerHTML = renderStudentApp(); bindAppEvents(); loadTodayEntry(); }
+}
+
+function renderLogin() {
+  return `<div class="login-wrapper"><div class="login-card">
+    <h1>Connecte-toi avec ton <em>email</em></h1>
+    <p class="sub">Pas de mot de passe — entre ton email et ton prénom</p>
+    <div id="login-error"></div>
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="ton@email.com" autofocus></div>
+    <div class="field"><label>Prénom</label><input type="text" id="login-name" placeholder="Jean"></div>
+    <div class="field"><label>Nom</label><input type="text" id="login-last" placeholder="Dupont"></div>
+    <button class="btn-enter" id="btn-login">Entrer →</button>
+    <p class="sub-info">Première connexion ? Ton compte sera créé automatiquement.</p>
+  </div></div>`;
+}
+
+function renderStudentApp() {
+  const u = currentUser;
+  return `<div class="app">
+    <header class="app-header">
+      <div class="app-brand">Tracking</div>
+      <button class="user-chip" id="btn-logout">${u.first_name} ↵</button>
+    </header>
+    <main class="app-main">
+      <div id="msg-area"></div>
+      <h1 class="page-id">Ma <em>fiche</em></h1>
+      <p class="today-date" id="today-display"></p>
+      <div class="card-today">
+        <div class="badge-pulse">Aujourd'hui — à remplir</div>
+        <h2 id="entry-date-title"></h2>
+        <div class="field-row">
+          <div class="field"><label>Calls</label><input type="number" id="field-calls" min="0" value="0"></div>
+          <div class="field"><label>DM</label><input type="number" id="field-dm" min="0" value="0"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Vidéos</label><input type="number" id="field-videos" min="0" value="0"></div>
+          <div class="field"><label>CA (€)</label><input type="number" id="field-ca" min="0" step="0.01" value="0"></div>
+        </div>
+        <div class="live-toggle">
+          <span style="font-weight:600;color:var(--ink-2)">Live</span>
+          <button id="btn-live-no" class="active">Non</button>
+          <button id="btn-live-yes">Oui</button>
+        </div>
+        <button class="btn-save" id="btn-save">Enregistrer ma fiche</button>
+      </div>
+      <div class="recap" id="recap-area"></div>
+      <div class="history-section">
+        <h3>Historique récent</h3>
+        <div id="history-table"></div>
+      </div>
+    </main>
+  </div>`;
+}
+
+function bindLoginEvents() {
+  document.getElementById('btn-login').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const name = document.getElementById('login-name').value.trim();
+    const last = document.getElementById('login-last').value.trim();
+    if (!email || !name || !last) return;
+    try {
+      await login(email, name, last);
+    } catch(e) {
+      document.getElementById('login-error').innerHTML = '<div class="error-msg">' + e.message + '</div>';
+    }
+  });
+  document.getElementById('login-last').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-login').click();
+  });
+}
+
+function bindAppEvents() {
+  document.getElementById('btn-logout').addEventListener('click', logout);
+  document.getElementById('btn-save').addEventListener('click', saveEntry);
+  document.getElementById('btn-live-yes').addEventListener('click', () => toggleLive(true));
+  document.getElementById('btn-live-no').addEventListener('click', () => toggleLive(false));
+}
+
+async function loadTodayEntry() {
+  const data = await apiCall('GET', '/me/today');
+  if (!data) return;
+  document.getElementById('field-calls').value = data.calls || 0;
+  document.getElementById('field-dm').value = data.dm || 0;
+  document.getElementById('field-videos').value = data.videos || 0;
+  document.getElementById('field-ca').value = data.ca_eur || 0;
+  toggleLive(data.live || false);
+  document.getElementById('entry-date-title').textContent = data.entry_date || new Date().toISOString().slice(0,10);
+  updateRecap(data);
+  const today = new Date();
+  document.getElementById('today-display').textContent = today.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+
+  // Load history
+  const history = await apiCall('GET', '/me/history');
+  if (history && history.length > 0) {
+    let rows = '';
+    history.slice(0, 14).forEach(e => {
+      const pts = (e.calls||0)*2 + (e.dm||0) + (e.videos||0)*3 + (e.live ? 5 : 0);
+      rows += `<tr>
+        <td>${e.entry_date}</td>
+        <td>${e.calls||0}</td><td>${e.dm||0}</td><td>${e.videos||0}</td>
+        <td>${e.live ? 'Oui' : '—'}</td>
+        <td>${(e.ca_eur||0).toFixed(2)}€</td>
+        <td><strong>${pts}</strong></td>
+      </tr>`;
+    });
+    document.getElementById('history-table').innerHTML = `<table class="history-table">
+      <thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  }
+}
+
+function toggleLive(val) {
+  window._live = val;
+  document.getElementById('btn-live-yes').className = val ? 'active' : '';
+  document.getElementById('btn-live-no').className = val ? '' : 'active';
+}
+
+function updateRecap(data) {
+  const calls = data.calls || 0, dm = data.dm || 0, videos = data.videos || 0, live = data.live || false;
+  const points = calls*2 + dm + videos*3 + (live ? 5 : 0), ca = data.ca_eur || 0;
+  document.getElementById('recap-area').innerHTML = `<h3>Récapitulatif</h3>
+    <div class="recap-row"><span class="recap-label">Calls</span><span class="recap-value">${calls} × 2 = ${calls*2} pts</span></div>
+    <div class="recap-row"><span class="recap-label">DM</span><span class="recap-value">${dm} × 1 = ${dm} pts</span></div>
+    <div class="recap-row"><span class="recap-label">Vidéos</span><span class="recap-value">${videos} × 3 = ${videos*3} pts</span></div>
+    <div class="recap-row"><span class="recap-label">Live</span><span class="recap-value">${live ? 'Oui (+5 pts)' : 'Non'}</span></div>
+    ${ca > 0 ? `<div class="recap-row"><span class="recap-label">CA généré</span><span class="recap-value">${ca.toFixed(2)} €</span></div>` : ''}
+    <div class="recap-points">${points} pts</div>`;
+}
+
+async function saveEntry() {
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Enregistrement...';
+  const data = {
+    calls: parseInt(document.getElementById('field-calls').value)||0,
+    dm: parseInt(document.getElementById('field-dm').value)||0,
+    videos: parseInt(document.getElementById('field-videos').value)||0,
+    live: window._live||false,
+    ca_eur: parseFloat(document.getElementById('field-ca').value)||0
+  };
+  const res = await apiCall('PUT', '/me/entries/' + new Date().toISOString().slice(0,10), data);
+  btn.disabled = false; btn.textContent = 'Enregistrer ma fiche';
+  if (res && res.id) {
+    document.getElementById('msg-area').innerHTML = '<div class="success-msg">✓ Fiche enregistrée !</div>';
+    updateRecap(res);
+    setTimeout(() => { document.getElementById('msg-area').innerHTML = ''; }, 3000);
+  } else {
+    document.getElementById('msg-area').innerHTML = '<div class="error-msg">' + (res?.detail || 'Erreur') + '</div>';
+  }
+}
+
+// Init
+const savedUser = localStorage.getItem('dj_user');
+const savedToken = localStorage.getItem('dj_token');
+if (savedUser && savedToken) { currentUser = JSON.parse(savedUser); }
+render();
+</script>
+</body>
+</html>
