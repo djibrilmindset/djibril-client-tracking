@@ -1,7 +1,7 @@
-// Supabase Edge Function: Tracking Djibril v4 (fixed paths)
+// Supabase Edge Function: Tracking Djibril v6
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-const STUDENT_HTML = `<!DOCTYPE html>
+const S=`<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -122,7 +122,7 @@ function renderStudentApp() {
   return \`<div class="app">
     <header class="app-header">
       <div class="app-brand">Tracking</div>
-      <button class="user-chip" id="btn-logout">\${u.first_name} ↵</button>
+      <button class="user-chip" id="btn-logout">\${}u.first_name} ↵</button>
     </header>
     <main class="app-main">
       <div id="msg-area"></div>
@@ -199,16 +199,16 @@ async function loadTodayEntry() {
     history.slice(0, 14).forEach(e => {
       const pts = (e.calls||0)*2 + (e.dm||0) + (e.videos||0)*3 + (e.live ? 5 : 0);
       rows += \`<tr>
-        <td>\${e.entry_date}</td>
-        <td>\${e.calls||0}</td><td>\${e.dm||0}</td><td>\${e.videos||0}</td>
-        <td>\${e.live ? 'Oui' : '—'}</td>
-        <td>\${(e.ca_eur||0).toFixed(2)}€</td>
-        <td><strong>\${pts}</strong></td>
+        <td>\${}e.entry_date}</td>
+        <td>\${}e.calls||0}</td><td>\${}e.dm||0}</td><td>\${}e.videos||0}</td>
+        <td>\${}e.live ? 'Oui' : '—'}</td>
+        <td>\${}(e.ca_eur||0).toFixed(2)}€</td>
+        <td><strong>\${}pts}</strong></td>
       </tr>\`;
     });
     document.getElementById('history-table').innerHTML = \`<table class="history-table">
       <thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead>
-      <tbody>\${rows}</tbody></table>\`;
+      <tbody>\${}rows}</tbody></table>\`;
   }
 }
 
@@ -222,12 +222,12 @@ function updateRecap(data) {
   const calls = data.calls || 0, dm = data.dm || 0, videos = data.videos || 0, live = data.live || false;
   const points = calls*2 + dm + videos*3 + (live ? 5 : 0), ca = data.ca_eur || 0;
   document.getElementById('recap-area').innerHTML = \`<h3>Récapitulatif</h3>
-    <div class="recap-row"><span class="recap-label">Calls</span><span class="recap-value">\${calls} × 2 = \${calls*2} pts</span></div>
-    <div class="recap-row"><span class="recap-label">DM</span><span class="recap-value">\${dm} × 1 = \${dm} pts</span></div>
-    <div class="recap-row"><span class="recap-label">Vidéos</span><span class="recap-value">\${videos} × 3 = \${videos*3} pts</span></div>
-    <div class="recap-row"><span class="recap-label">Live</span><span class="recap-value">\${live ? 'Oui (+5 pts)' : 'Non'}</span></div>
-    \${ca > 0 ? \`<div class="recap-row"><span class="recap-label">CA généré</span><span class="recap-value">\${ca.toFixed(2)} €</span></div>\` : ''}
-    <div class="recap-points">\${points} pts</div>\`;
+    <div class="recap-row"><span class="recap-label">Calls</span><span class="recap-value">\${}calls} × 2 = \${}calls*2} pts</span></div>
+    <div class="recap-row"><span class="recap-label">DM</span><span class="recap-value">\${}dm} × 1 = \${}dm} pts</span></div>
+    <div class="recap-row"><span class="recap-label">Vidéos</span><span class="recap-value">\${}videos} × 3 = \${}videos*3} pts</span></div>
+    <div class="recap-row"><span class="recap-label">Live</span><span class="recap-value">\${}live ? 'Oui (+5 pts)' : 'Non'}</span></div>
+    \${}ca > 0 ? \`<div class="recap-row"><span class="recap-label">CA généré</span><span class="recap-value">\${}ca.toFixed(2)} €</span></div>\` : ''}
+    <div class="recap-points">\${}points} pts</div>\`;
 }
 
 async function saveEntry() {
@@ -259,8 +259,7 @@ render();
 </script>
 </body>
 </html>
-`;
-const COACH_HTML = `<!DOCTYPE html>
+`,C=`<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -318,10 +317,10 @@ function renderList(stats) {
   students.forEach(s => {
     const filled = s.has_filled;
     rows += \`<tr>
-      <td>\${s.first_name} \${s.full_name||''}</td>
-      <td>\${s.email}</td>
-      <td><span class="status-dot \${filled?'status-filled':'status-missing'}"></span>\${filled?'Rempli':'Manquant'}</td>
-      <td><a onclick="showDetail('\${s.id}')">Voir →</a></td>
+      <td>\${}s.first_name} \${}s.full_name||''}</td>
+      <td>\${}s.email}</td>
+      <td><span class="status-dot \${}filled?'status-filled':'status-missing'}"></span>\${}filled?'Rempli':'Manquant'}</td>
+      <td><a onclick="showDetail('\${}s.id}')">Voir →</a></td>
     </tr>\`;
   });
   document.getElementById('app').innerHTML = \`<div class="app-c">
@@ -333,13 +332,13 @@ function renderList(stats) {
     </header>
     <h1 class="page-id">Mes <em>élèves</em></h1>
     <div class="kpi-bar">
-      <div class="kpi-card"><div class="kpi-num">\${stats.total||0}</div><div class="kpi-label">Total</div></div>
-      <div class="kpi-card"><div class="kpi-num">\${stats.filled||0}</div><div class="kpi-label">Remplis</div></div>
-      <div class="kpi-card"><div class="kpi-num">\${stats.missing||0}</div><div class="kpi-label">Manquants</div></div>
-      <div class="kpi-card"><div class="kpi-num">\${(stats.ca_total||0).toFixed(0)}€</div><div class="kpi-label">CA jour</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}stats.total||0}</div><div class="kpi-label">Total</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}stats.filled||0}</div><div class="kpi-label">Remplis</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}stats.missing||0}</div><div class="kpi-label">Manquants</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}(stats.ca_total||0).toFixed(0)}€</div><div class="kpi-label">CA jour</div></div>
     </div>
     <h2 class="section-title">Liste</h2>
-    \${students.length > 0 ? \`<table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd'hui</th><th></th></tr></thead><tbody>\${rows}</tbody></table>\` : '<div class="empty-state">Aucun élève</div>'}
+    \${}students.length > 0 ? \`<table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd'hui</th><th></th></tr></thead><tbody>\${}rows}</tbody></table>\` : '<div class="empty-state">Aucun élève</div>'}
   </div>\`;
 }
 
@@ -352,11 +351,11 @@ async function showDetail(id) {
   let entryRows = '';
   entries.slice(0, 14).forEach(e => {
     entryRows += \`<tr>
-      <td>\${e.entry_date}</td>
-      <td>\${e.calls}</td><td>\${e.dm}</td><td>\${e.videos}</td>
-      <td>\${e.live?'Oui':'—'}</td>
-      <td>\${(e.ca_eur||0).toFixed(2)}€</td>
-      <td><strong>\${e.calls*2 + e.dm + e.videos*3 + (e.live?5:0)}</strong></td>
+      <td>\${}e.entry_date}</td>
+      <td>\${}e.calls}</td><td>\${}e.dm}</td><td>\${}e.videos}</td>
+      <td>\${}e.live?'Oui':'—'}</td>
+      <td>\${}(e.ca_eur||0).toFixed(2)}€</td>
+      <td><strong>\${}e.calls*2 + e.dm + e.videos*3 + (e.live?5:0)}</strong></td>
     </tr>\`;
   });
 
@@ -364,7 +363,7 @@ async function showDetail(id) {
   (data.audit||[]).forEach(a => {
     const ts = (a.performed_at||'').slice(0,19);
     const color = a.action === 'UPDATE' ? 'style="color:#f59e0b"' : '';
-    auditHtml += \`<div class="audit-line" \${color}>\${ts} [\${a.action}] \${a.entry_date}</div>\`;
+    auditHtml += \`<div class="audit-line" \${}color}>\${}ts} [\${}a.action}] \${}a.entry_date}</div>\`;
   });
 
   // Compute stats
@@ -376,17 +375,17 @@ async function showDetail(id) {
       <div class="app-brand">Tracking Coach</div>
       <a class="btn-back" onclick="load()">← Retour</a>
     </header>
-    <h1 class="page-id" style="font-size:clamp(28px,4vw,40px)">\${s.first_name} <em>\${s.full_name||''}</em></h1>
-    <p style="color:var(--ink-3);margin-bottom:24px">\${s.email} · Inscrit le \${(s.joined_at||'').slice(0,10)}</p>
+    <h1 class="page-id" style="font-size:clamp(28px,4vw,40px)">\${}s.first_name} <em>\${}s.full_name||''}</em></h1>
+    <p style="color:var(--ink-3);margin-bottom:24px">\${}s.email} · Inscrit le \${}(s.joined_at||'').slice(0,10)}</p>
     <div class="kpi-bar" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px">
-      <div class="kpi-card"><div class="kpi-num">\${entries.length}</div><div class="kpi-label">Fiches</div></div>
-      <div class="kpi-card"><div class="kpi-num">\${totalPts}</div><div class="kpi-label">Points totaux</div></div>
-      <div class="kpi-card"><div class="kpi-num">\${totalCA.toFixed(0)}€</div><div class="kpi-label">CA cumulé</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}entries.length}</div><div class="kpi-label">Fiches</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}totalPts}</div><div class="kpi-label">Points totaux</div></div>
+      <div class="kpi-card"><div class="kpi-num">\${}totalCA.toFixed(0)}€</div><div class="kpi-label">CA cumulé</div></div>
     </div>
     <h2 class="section-title">Fiches récentes</h2>
-    \${entryRows ? \`<table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Points</th></tr></thead><tbody>\${entryRows}</tbody></table>\` : '<div class="empty-state">Aucune fiche</div>'}
+    \${}entryRows ? \`<table><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Points</th></tr></thead><tbody>\${}entryRows}</tbody></table>\` : '<div class="empty-state">Aucune fiche</div>'}
     <h2 class="section-title" style="margin-top:32px">Audit log</h2>
-    <div class="audit-log">\${auditHtml || 'Aucune modification'}</div>
+    <div class="audit-log">\${}auditHtml || 'Aucune modification'}</div>
   </div>\`;
 }
 
@@ -394,8 +393,7 @@ load();
 </script>
 </body>
 </html>
-`;
-const FORGE_CSS = `
+`,F=`
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Anton&display=swap');
 
@@ -3353,24 +3351,30 @@ body {
   .kpi__val { font-size: 28px; }
 }
 `;
-const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type"};
+const H={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type"};
 const sb=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const TS=Deno.env.get("TOKEN_SECRET")||"djibril-tracking-secret-2026";
-function gt(sid:string):string{const p=btoa(JSON.stringify({sid,exp:Date.now()+30*86400000}));return p+"."+btoa([...new Uint8Array(new TextEncoder().encode(p+TS))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40))}
-function vt(t:string):string|null{try{const[b64,sig]=t.split(".");if(!b64||!sig)return null;const e=btoa([...new Uint8Array(new TextEncoder().encode(b64+TS))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40));if(sig!==e)return null;const p=JSON.parse(atob(b64));return p.exp<Date.now()?null:p.sid}catch{return null}}
-async function fc(e:string,n:string,l:string){e=e.toLowerCase().trim();const{data:x}=await sb.from("students").select("*").eq("email",e).maybeSingle();if(x)return x;const{data:c}=await sb.from("students").insert({email:e,first_name:n,full_name:l}).select().single();return c}
-async function hr(req:Request):Promise<Response>{const u=new URL(req.url);let p=u.pathname;const m=req.method;if(m==="OPTIONS")return new Response(null,{headers:CORS});if(p.startsWith("/tracking-app"))p=p.slice("/tracking-app".length)||"/";
-if(p==="/forge.css")return new Response(FORGE_CSS,{headers:{...CORS,"Content-Type":"text/css"}});
-if(p==="/"||p==="/student"||p==="/app")return new Response(STUDENT_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
-if(p==="/coach"||p==="/admin")return new Response(COACH_HTML,{headers:{...CORS,"Content-Type":"text/html"}});
-if(p==="/api/coach/students"&&m==="GET"){const{data:s}=await sb.from("students").select("*").order("joined_at",{ascending:false});const td=new Date().toISOString().slice(0,10);const{data:e}=await sb.from("daily_entries").select("*").eq("entry_date",td);const em:Record<string,any>={};(e||[]).forEach((x:any)=>{em[x.student_id]=x});return Response.json((s||[]).map((x:any)=>({...x,has_filled:!!em[x.id],today_entry:em[x.id]||null})),{headers:CORS})}
-if(p==="/api/coach/stats"&&m==="GET"){const{count:t}=await sb.from("students").select("*",{count:"exact",head:true});const td=new Date().toISOString().slice(0,10);const{count:f}=await sb.from("daily_entries").select("*",{count:"exact",head:true}).eq("entry_date",td);const{data:cd}=await sb.from("daily_entries").select("ca_eur").eq("entry_date",td);const ca=(cd||[]).reduce((s:number,x:any)=>s+(x.ca_eur||0),0);return Response.json({total:t||0,filled:f||0,missing:(t||0)-(f||0),ca_total:Math.round(ca*100)/100},{headers:CORS})}
-const dm=p.match(/^\/api\/coach\/students\/([a-f0-9-]+)$/);if(dm&&m==="GET"){const{data:s}=await sb.from("students").select("*").eq("id",dm[1]).single();const{data:e}=await sb.from("daily_entries").select("*").eq("student_id",dm[1]).order("entry_date",{ascending:false}).limit(30);const{data:a}=await sb.from("entry_audit").select("*").eq("student_id",dm[1]).order("performed_at",{ascending:false}).limit(50);return Response.json({student:s,entries:e||[],audit:a||[]},{headers:CORS})}
-if(p==="/api/auth"&&m==="POST"){const{email,firstName,lastName}=await req.json();if(!email||!firstName||!lastName)return Response.json({error:"Email, prenom et nom requis"},{status:400,headers:CORS});const s=await fc(email,firstName,lastName);return Response.json({token:gt(s.id),student:s},{headers:CORS})}
+const K=Deno.env.get("TOKEN_SECRET")||"djibril-tracking-secret-2026";
+function gt(sid:string):string{const p=btoa(JSON.stringify({sid,exp:Date.now()+30*86400000}));return p+"."+btoa([...new Uint8Array(new TextEncoder().encode(p+K))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40))}
+function vt(t:string):string|null{try{const[b64,sig]=t.split(".");if(!b64||!sig)return null;const x=btoa([...new Uint8Array(new TextEncoder().encode(b64+K))].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40));if(sig!==x)return null;const p=JSON.parse(atob(b64));return p.exp<Date.now()?null:p.sid}catch{return null}}
+async function fc(e:string,n:string,l:string){e=e.toLowerCase().trim();const{data:x}=await sb.from("students").select("*").eq("email",e).maybeSingle();if(x)return x;const{data:r}=await sb.from("students").insert({email:e,first_name:n,full_name:l}).select().single();return r}
+async function hr(req:Request):Promise<Response>{const u=new URL(req.url);let p=u.pathname;const m=req.method;if(m==="OPTIONS")return new Response(null,{headers:H});
+// Build base URL from the request (handles Supabase proxy URL rewriting)
+const base=u.origin+"/functions/v1/tracking-app";
+if(p.startsWith("/tracking-app"))p=p.slice("/tracking-app".length)||"/";
+if(p===""||p==="/")p="/";
+// Redirect /coach -> /coach/ for proper relative CSS loading
+if(p==="/coach"||p==="/admin")return new Response(null,{status:301,headers:{...H,"Location":base+"/coach/"}});
+if(p==="/forge.css")return new Response(F,{headers:{...H,"Content-Type":"text/css"}});
+if(p==="/"||p==="/student"||p==="/app")return new Response(S,{headers:{...H,"Content-Type":"text/html"}});
+if(p==="/coach/"||p==="/admin/")return new Response(C,{headers:{...H,"Content-Type":"text/html"}});
+if(p==="/api/coach/students"&&m==="GET"){const{data:s}=await sb.from("students").select("*").order("joined_at",{ascending:false});const td=new Date().toISOString().slice(0,10);const{data:e}=await sb.from("daily_entries").select("*").eq("entry_date",td);const em:Record<string,any>={};(e||[]).forEach((x:any)=>{em[x.student_id]=x});return Response.json((s||[]).map((x:any)=>({...x,has_filled:!!em[x.id],today_entry:em[x.id]||null})),{headers:H})}
+if(p==="/api/coach/stats"&&m==="GET"){const{count:t}=await sb.from("students").select("*",{count:"exact",head:true});const td=new Date().toISOString().slice(0,10);const{count:f}=await sb.from("daily_entries").select("*",{count:"exact",head:true}).eq("entry_date",td);const{data:cd}=await sb.from("daily_entries").select("ca_eur").eq("entry_date",td);const ca=(cd||[]).reduce((s:number,x:any)=>s+(x.ca_eur||0),0);return Response.json({total:t||0,filled:f||0,missing:(t||0)-(f||0),ca_total:Math.round(ca*100)/100},{headers:H})}
+const dm=p.match(/^\/api\/coach\/students\/([a-f0-9-]+)$/);if(dm&&m==="GET"){const{data:s}=await sb.from("students").select("*").eq("id",dm[1]).single();const{data:e}=await sb.from("daily_entries").select("*").eq("student_id",dm[1]).order("entry_date",{ascending:false}).limit(30);const{data:a}=await sb.from("entry_audit").select("*").eq("student_id",dm[1]).order("performed_at",{ascending:false}).limit(50);return Response.json({student:s,entries:e||[],audit:a||[]},{headers:H})}
+if(p==="/api/auth"&&m==="POST"){const{email,firstName,lastName}=await req.json();if(!email||!firstName||!lastName)return Response.json({error:"Email, prenom et nom requis"},{status:400,headers:H});const s=await fc(email,firstName,lastName);return Response.json({token:gt(s.id),student:s},{headers:H})}
 const ah=req.headers.get("Authorization");let sid:string|null=null;if(ah?.startsWith("Bearer "))sid=vt(ah.slice(7));
-if(p.startsWith("/api/")&&!p.startsWith("/api/coach/")){if(!sid)return Response.json({error:"Non autorise"},{status:401,headers:CORS});
-if(p==="/api/me/today"&&m==="GET"){const td=new Date().toISOString().slice(0,10);const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).eq("entry_date",td).maybeSingle();if(d)return Response.json(d,{headers:CORS});const{data:c}=await sb.from("daily_entries").insert({student_id:sid,entry_date:td,calls:0,dm:0,videos:0,live:false,ca_eur:0}).select().single();return Response.json(c,{headers:CORS})}
-if(p==="/api/me/history"&&m==="GET"){const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).order("entry_date",{ascending:false}).limit(30);return Response.json(d||[],{headers:CORS})}
-const em=p.match(/^\/api\/me\/entries\/(\d{4}-\d{2}-\d{2})$/);if(em&&m==="PUT"){const ed=em[1];const tda=new Date();tda.setDate(tda.getDate()-3);if(new Date(ed)<new Date(tda.toISOString().slice(0,10)))return Response.json({error:"3 jours max"},{status:400,headers:CORS});const b=await req.json();const{data:d}=await sb.from("daily_entries").upsert({student_id:sid,entry_date:ed,calls:b.calls||0,dm:b.dm||0,videos:b.videos||0,live:b.live||false,ca_eur:b.ca_eur||0},{onConflict:"student_id, entry_date"}).select().single();return Response.json(d,{headers:CORS})}}
-return new Response("Not Found",{status:404,headers:CORS});}
+if(p.startsWith("/api/")&&!p.startsWith("/api/coach/")){if(!sid)return Response.json({error:"Non autorise"},{status:401,headers:H});
+if(p==="/api/me/today"&&m==="GET"){const td=new Date().toISOString().slice(0,10);const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).eq("entry_date",td).maybeSingle();if(d)return Response.json(d,{headers:H});const{data:r}=await sb.from("daily_entries").insert({student_id:sid,entry_date:td,calls:0,dm:0,videos:0,live:false,ca_eur:0}).select().single();return Response.json(r,{headers:H})}
+if(p==="/api/me/history"&&m==="GET"){const{data:d}=await sb.from("daily_entries").select("*").eq("student_id",sid).order("entry_date",{ascending:false}).limit(30);return Response.json(d||[],{headers:H})}
+const em=p.match(/^\/api\/me\/entries\/(\d{4}-\d{2}-\d{2})$/);if(em&&m==="PUT"){const ed=em[1];const tda=new Date();tda.setDate(tda.getDate()-3);if(new Date(ed)<new Date(tda.toISOString().slice(0,10)))return Response.json({error:"3 jours max"},{status:400,headers:H});const b=await req.json();const{data:d}=await sb.from("daily_entries").upsert({student_id:sid,entry_date:ed,calls:b.calls||0,dm:b.dm||0,videos:b.videos||0,live:b.live||false,ca_eur:b.ca_eur||0},{onConflict:"student_id, entry_date"}).select().single();return Response.json(d,{headers:H})}}
+return new Response("Not Found",{status:404,headers:H});}
 serve(hr);
