@@ -2,255 +2,632 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Tracking · Djibril</title>
 <link rel="stylesheet" href="forge.css">
 <style>
-  .login-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:1 }
-  .login-card { background:var(--paper-soft); border:1px solid var(--line-strong); border-radius:var(--r-lg); padding:48px 40px; width:100%; max-width:440px; box-shadow:var(--shadow-2); text-align:center }
-  .login-card h1 { font-family:var(--font-display); font-size:clamp(28px,4vw,40px); color:var(--ink); margin-bottom:8px; letter-spacing:-0.5px }
-  .login-card h1 em { font-style:italic; background:var(--grad-ember); -webkit-background-clip:text; -webkit-text-fill-color:transparent }
-  .login-card p.sub { color:var(--ink-3); font-size:14px; margin-bottom:32px }
-  .field { margin-bottom:18px; text-align:left }
-  .field label { display:block; font-size:11px; font-weight:600; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px }
-  .field input { width:100%; padding:12px 16px; border:1px solid var(--line-strong); border-radius:var(--r-sm); font-size:16px; font-family:var(--font-body); background:var(--paper); color:var(--ink); outline:none; transition:border .2s }
-  .field input:focus { border-color:var(--ember); box-shadow:0 0 0 3px var(--ember-soft) }
-  .btn-enter { width:100%; padding:14px; background:var(--grad-ember); color:#fff; border:none; border-radius:var(--r-sm); font-size:16px; font-weight:600; cursor:pointer; transition:transform .15s,box-shadow .15s; margin-top:8px }
-  .btn-enter:hover { transform:translateY(-1px); box-shadow:var(--shadow-glow) }
-  .error-msg { background:var(--blood-soft); color:var(--blood); padding:12px; border-radius:var(--r-sm); font-size:13px; margin-bottom:16px }
-  .success-msg { background:rgba(39,166,68,0.1); color:#27a644; padding:12px; border-radius:var(--r-sm); font-size:14px; margin-bottom:16px; text-align:center }
-  .sub-info { margin-top:20px; font-size:12px; color:var(--ink-4) }
-  .app { position:relative; z-index:1; min-height:100vh; background:transparent }
-  .app-header { display:flex; align-items:center; justify-content:space-between; padding:20px 32px; border-bottom:1px solid var(--line); background:rgba(246,241,232,0.92); backdrop-filter:blur(14px); position:sticky; top:0; z-index:50 }
-  .app-brand { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--ink); letter-spacing:-0.3px }
-  .user-chip { display:flex; align-items:center; gap:10px; font-size:14px; color:var(--ink-2); cursor:pointer; padding:6px 14px; border-radius:var(--r-pill); background:var(--ember-soft); border:none }
-  .app-main { max-width:680px; margin:0 auto; padding:40px 24px }
-  .page-id { font-family:var(--font-serif); font-size:clamp(40px,6vw,72px); font-style:italic; color:var(--ink); margin-bottom:8px }
-  .page-id em { color:var(--ember) }
-  .today-date { font-size:14px; color:var(--ink-3); margin-bottom:32px }
-  .card-today { background:var(--paper-soft); border:2px solid var(--ember); border-radius:var(--r-lg); padding:32px; box-shadow:var(--shadow-2) }
-  .badge-pulse { display:inline-flex; align-items:center; gap:6px; background:var(--ember-soft); color:var(--ember); padding:4px 12px; border-radius:var(--r-pill); font-size:12px; font-weight:600; margin-bottom:20px }
-  .badge-pulse::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--ember); animation:pulse-dot 1.5s ease-in-out infinite }
-  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
-  .card-today h2 { font-family:var(--font-display); font-size:22px; color:var(--ink); margin-bottom:24px }
-  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px }
-  @media(max-width:500px){ .field-row{grid-template-columns:1fr} }
-  .field-row .field input { text-align:center; font-size:18px; font-weight:600 }
-  .live-toggle { display:flex; align-items:center; gap:10px; margin:12px 0 24px }
-  .live-toggle button { padding:8px 20px; border-radius:var(--r-pill); border:2px solid var(--line-strong); background:var(--paper); color:var(--ink-3); cursor:pointer; font-weight:600; font-size:14px; transition:all .2s }
-  .live-toggle button.active { background:var(--blood); border-color:var(--blood); color:#fff }
-  .btn-save { width:100%; padding:14px; background:var(--grad-ember); color:#fff; border:none; border-radius:var(--r-sm); font-size:16px; font-weight:600; cursor:pointer }
-  .btn-save:disabled { opacity:0.5; cursor:not-allowed }
-  .recap { margin-top:32px }
-  .recap h3 { font-family:var(--font-display); font-size:18px; color:var(--ink); margin-bottom:16px }
-  .recap-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line) }
-  .recap-label { font-weight:500; color:var(--ink-2) }
-  .recap-value { font-weight:700; color:var(--ink) }
-  .recap-points { margin-top:16px; text-align:right; font-family:var(--font-display); font-size:40px; font-weight:700; color:var(--ember) }
-  .history-section { margin-top:48px }
-  .history-section h3 { font-family:var(--font-display); font-size:18px; color:var(--ink); margin-bottom:16px }
-  .history-table { width:100%; border-collapse:collapse; font-size:13px }
-  .history-table th { text-align:left; padding:8px 12px; font-size:11px; font-weight:600; color:var(--ink-4); text-transform:uppercase; border-bottom:1px solid var(--line-strong); background:var(--paper-soft) }
-  .history-table td { padding:8px 12px; border-bottom:1px solid var(--line) }
+/* === COSMOS ANIMATIONS === */
+.cosmos{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.cosmos .particle{position:absolute;border-radius:50%;animation:float-up linear infinite;opacity:0}
+.cosmos .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+.cosmos .shooting{position:absolute;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(232,93,44,0.6),transparent);animation:shoot 4s linear infinite;opacity:0}
+@keyframes float-up{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:0.6}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+@keyframes shoot{0%{transform:translateX(-100px) translateY(0);opacity:0}5%{opacity:1}15%{transform:translateX(calc(100vw+100px)) translateY(-20px);opacity:0}100%{opacity:0}}
+
+/* === LOGIN === */
+.login-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;padding:16px}
+.login-card{background:var(--paper-soft);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:40px 32px;width:100%;max-width:420px;box-shadow:var(--shadow-2);text-align:center;position:relative;z-index:1}
+.login-card h1{font-family:var(--font-display);font-size:clamp(24px,4vw,36px);color:var(--ink);margin-bottom:8px;letter-spacing:-0.5px}
+.login-card h1 em{font-style:italic;background:var(--grad-ember);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-card p.sub{color:var(--ink-3);font-size:13px;margin-bottom:28px}
+.login-card p.sub2{color:var(--ink-4);font-size:11px;margin-top:8px}
+.field{margin-bottom:16px;text-align:left}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.field input{width:100%;padding:13px 16px;border:1px solid var(--line-strong);border-radius:var(--r-sm);font-size:16px;font-family:var(--font-body);background:var(--paper);color:var(--ink);outline:none;transition:border .2s;-webkit-appearance:none}
+.field input:focus{border-color:var(--ember);box-shadow:0 0 0 3px var(--ember-soft)}
+.btn-enter{width:100%;padding:14px;background:var(--grad-ember);color:#fff;border:none;border-radius:var(--r-sm);font-size:16px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s;margin-top:8px}
+.btn-enter:hover{transform:translateY(-1px);box-shadow:var(--shadow-glow)}
+.btn-enter:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.error-msg{background:var(--blood-soft);color:var(--blood);padding:12px;border-radius:var(--r-sm);font-size:13px;margin-bottom:16px}
+.success-msg{background:rgba(39,166,68,0.1);color:#27a644;padding:12px;border-radius:var(--r-sm);font-size:14px;margin-bottom:16px;text-align:center}
+#name-fields{display:none;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* === APP LAYOUT === */
+.app{position:relative;z-index:1;min-height:100vh;background:transparent;padding-bottom:80px}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(246,241,232,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:sticky;top:0;z-index:50}
+.app-brand{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.3px}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;padding:6px 12px;border-radius:var(--r-pill);background:var(--ember-soft);border:none;font-family:var(--font-body)}
+.app-main{max-width:680px;margin:0 auto;padding:20px 16px}
+
+/* === PAGE ID === */
+.page-id{font-family:var(--font-serif);font-size:clamp(32px,5vw,56px);font-style:italic;color:var(--ink);margin-bottom:6px}
+.page-id em{color:var(--ember)}
+.today-date{font-size:13px;color:var(--ink-3);margin-bottom:24px}
+
+/* === CARD TODAY === */
+.card-today{background:var(--paper-soft);border:2px solid var(--ember);border-radius:var(--r-lg);padding:24px 20px;box-shadow:var(--shadow-2)}
+.badge-pulse{display:inline-flex;align-items:center;gap:8px;background:var(--ember-soft);color:var(--ember);padding:5px 14px;border-radius:var(--r-pill);font-size:12px;font-weight:600;margin-bottom:16px}
+.badge-pulse::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ember);animation:pulse-dot 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.card-today h2{font-family:var(--font-display);font-size:20px;color:var(--ink);margin-bottom:20px}
+.date-nav{display:flex;align-items:center;gap:12px;margin-top:8px}
+.date-nav button{background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer;font-size:14px;color:var(--ink-2);transition:all .2s}
+.date-nav button:hover{background:var(--paper-deep)}
+.date-nav .date-display{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--ink);min-width:100px;text-align:center}
+.date-nav .today-btn{background:var(--ember-soft);color:var(--ember);border-color:var(--ember);font-weight:600}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:400px){.field-row{grid-template-columns:1fr}}
+.field-row .field input{text-align:center;font-size:18px;font-weight:600}
+
+/* === LIVE TOGGLE FIX === */
+.live-toggle{display:flex;align-items:center;gap:10px;margin:16px 0 24px}
+.live-toggle .live-label{font-weight:600;font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.live-toggle .live-icon{width:10px;height:10px;border-radius:50%;background:var(--ink-4);transition:all .3s}
+.live-toggle .live-icon.active{background:#ff3b30;box-shadow:0 0 8px rgba(255,59,48,0.6);animation:pulse-dot 1s ease-in-out infinite}
+.live-toggle button{padding:10px 22px;border-radius:var(--r-pill);border:2px solid var(--line-strong);background:var(--paper);color:var(--ink-3);cursor:pointer;font-weight:600;font-size:14px;transition:all .2s;min-width:60px}
+.live-toggle button.active{background:var(--blood);border-color:var(--blood);color:#fff}
+.btn-save{width:100%;padding:14px;background:var(--grad-ember);color:#fff;border:none;border-radius:var(--r-sm);font-size:16px;font-weight:600;cursor:pointer}
+.btn-save:disabled{opacity:0.5;cursor:not-allowed}
+
+/* === RECAP === */
+.recap{margin-top:28px}
+.recap h3{font-family:var(--font-display);font-size:18px;color:var(--ink);margin-bottom:12px}
+.recap-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.recap-label{font-weight:500;color:var(--ink-2)}
+.recap-value{font-weight:700;color:var(--ink)}
+.recap-points{margin-top:14px;text-align:right;font-family:var(--font-display);font-size:36px;font-weight:700;color:var(--ember)}
+
+/* === HISTORY === */
+.history-section{margin-top:36px}
+.history-section h3{font-family:var(--font-display);font-size:18px;color:var(--ink);margin-bottom:12px}
+.history-table{width:100%;border-collapse:collapse;font-size:12px}
+.history-table th{text-align:left;padding:8px 10px;font-size:10px;font-weight:600;color:var(--ink-4);text-transform:uppercase;border-bottom:1px solid var(--line-strong);background:var(--paper-soft)}
+.history-table td{padding:8px 10px;border-bottom:1px solid var(--line)}
+@media(max-width:500px){.history-table th:nth-child(5),.history-table td:nth-child(5),.history-table th:nth-child(6),.history-table td:nth-child(6){display:none}}
+
+/* === BOTTOM NAV === */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:rgba(246,241,232,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;border:none;background:none;cursor:pointer;color:var(--ink-4);font-size:10px;font-weight:500;transition:all .2s;border-radius:var(--r-sm);min-width:56px}
+.nav-item .nav-icon{font-size:20px;line-height:1}
+.nav-item.active{color:var(--ember)}
+.nav-item:active{transform:scale(0.95)}
+.nav-item .nav-dot{width:4px;height:4px;border-radius:50%;background:var(--ember);opacity:0;transition:opacity .2s}
+.nav-item.active .nav-dot{opacity:1}
+
+/* === SECTIONS === */
+.section{display:none;animation:fadeIn 0.3s ease}
+.section.active{display:block}
+
+/* === BIBLIOTHEQUE === */
+.lib-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
+.lib-card h4{font-family:var(--font-display);font-size:15px;color:var(--ink);margin-bottom:4px}
+.lib-card p{font-size:13px;color:var(--ink-3);margin-bottom:8px}
+.lib-card .lib-tag{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);font-size:10px;font-weight:600;margin-right:6px}
+.lib-tag.video{background:rgba(232,93,44,0.1);color:var(--ember)}
+.lib-tag.article{background:rgba(107,58,79,0.1);color:var(--plum)}
+.lib-tag.outil{background:rgba(44,62,80,0.1);color:var(--ink-blue)}
+
+/* === QUESTIONS === */
+.question-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
+.question-card .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.question-card .q-date{font-size:11px;color:var(--ink-4)}
+.question-card .q-status{font-size:11px;font-weight:600;padding:2px 10px;border-radius:var(--r-pill)}
+.q-status.answered{background:rgba(39,166,68,0.1);color:#27a644}
+.q-status.pending{background:var(--ember-soft);color:var(--ember)}
+.ask-box{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;margin-bottom:16px}
+.ask-box textarea{width:100%;padding:12px;border:1px solid var(--line-strong);border-radius:var(--r-sm);font-family:var(--font-body);font-size:14px;resize:vertical;min-height:80px;background:var(--paper);color:var(--ink)}
+
+/* === STATS === */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;text-align:center}
+.stat-card .stat-num{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ink)}
+.stat-card .stat-label{font-size:10px;color:var(--ink-4);text-transform:uppercase;margin-top:4px}
+.stat-bar{display:flex;align-items:center;gap:8px;margin:6px 0}
+.stat-bar .bar-label{font-size:12px;color:var(--ink-2);width:80px;text-align:right}
+.stat-bar .bar-track{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.stat-bar .bar-fill{height:100%;background:var(--grad-ember);border-radius:3px;transition:width 0.5s ease}
+.stat-bar .bar-val{font-size:12px;font-weight:600;color:var(--ink);width:40px}
+
+/* === PAGE INTERNE (non-fiche) === */
+.page-section{margin-bottom:40px}
+.empty-state{text-align:center;padding:32px 16px;color:var(--ink-4);font-size:14px}
+
+/* === MOBILE (already mobile-first above) === */
+@media(min-width:768px){
+  .app-main{padding:40px 24px}
+  .bottom-nav{max-width:680px;left:50%;transform:translateX(-50%);border-radius:var(--r-lg) var(--r-lg) 0 0}
+}
 </style>
 </head>
 <body>
-<div class="cosmos" aria-hidden="true"></div>
+
+<!-- COSMOS BACKGROUND -->
+<div class="cosmos" id="cosmos" aria-hidden="true"></div>
+
 <div id="app"></div>
 
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="nav-item active" data-page="fiche">
+    <span class="nav-icon">📋</span>Fiche
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-item" data-page="biblio">
+    <span class="nav-icon">📚</span>Biblio
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-item" data-page="questions">
+    <span class="nav-icon">💬</span>Questions
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-item" data-page="stats">
+    <span class="nav-icon">📊</span>Stats
+    <span class="nav-dot"></span>
+  </button>
+</nav>
+
 <script>
-const API = 'https://nbnbsljqtolzzuqnkyae.supabase.co/functions/v1/tracking-app/api';
-let currentUser = null;
+// === COSMOS ANIMATIONS ===
+(function initCosmos(){
+  var c = document.getElementById('cosmos');
+  for(var i=0;i<20;i++){
+    var p=document.createElement('div');p.className='particle';
+    p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';
+    p.style.animationDelay=Math.random()*10+'s';
+    p.style.width=(3+Math.random()*6)+'px';p.style.height=p.style.width;
+    var colors=['#e85d2c','#d4951a','#f4e4c1','#6b3a4f','#ff6bb0'];
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.appendChild(p);
+  }
+  for(var i=0;i<30;i++){
+    var s=document.createElement('div');s.className='star';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=Math.random()*3+'s';
+    s.style.width=(1+Math.random()*2)+'px';s.style.height=s.style.width;
+    c.appendChild(s);
+  }
+  for(var i=0;i<3;i++){
+    var sh=document.createElement('div');sh.className='shooting';
+    sh.style.top=(10+Math.random()*50)+'%';sh.style.animationDelay=(i*1.5)+'s';
+    c.appendChild(sh);
+  }
+})();
 
-async function login(email, firstName, lastName) {
-  const res = await fetch(API + '/auth', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({email, firstName, lastName})
+// === STATE ===
+var API = 'https://nbnbsljqtolzzuqnkyae.supabase.co/functions/v1/tracking-app/api';
+var currentUser = null;
+var currentPage = 'fiche';
+var selectedDate = new Date().toISOString().slice(0,10);
+
+// === SMART LOGIN ===
+async function checkEmail(email){
+  email = email.toLowerCase().trim();
+  var res = await fetch(API+'/auth',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:email,firstName:'_CHECK_',lastName:'_CHECK_'})
   });
-  if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Erreur'); }
-  const data = await res.json();
-  localStorage.setItem('dj_token', data.token);
-  localStorage.setItem('dj_user', JSON.stringify(data.student));
-  currentUser = data.student;
+  if(!res.ok) return null;
+  return await res.json();
+}
+
+async function login(email,firstName,lastName){
+  var res = await fetch(API+'/auth',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:email,firstName:firstName,lastName:lastName})
+  });
+  if(!res.ok){var err=await res.json();throw new Error(err.detail||err.error||'Erreur');}
+  var data=await res.json();
+  localStorage.setItem('dj_token',data.token);
+  localStorage.setItem('dj_user',JSON.stringify(data.student));
+  currentUser=data.student;
   render();
 }
 
-function logout() {
-  localStorage.removeItem('dj_token');
-  localStorage.removeItem('dj_user');
-  currentUser = null;
-  render();
+function logout(){
+  localStorage.removeItem('dj_token');localStorage.removeItem('dj_user');
+  currentUser=null;render();
 }
 
-async function apiCall(method, path, body) {
-  const h = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + localStorage.getItem('dj_token')
-  };
-  const opts = { method, headers: h };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API + path, opts);
-  if (res.status === 401) { logout(); return null; }
+async function apiCall(method,path,body){
+  var h={'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('dj_token')};
+  var opts={method:method,headers:h};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch(API+path,opts);
+  if(res.status===401){logout();return null;}
   return res.json();
 }
 
-function render() {
-  const root = document.getElementById('app');
-  if (!currentUser) { root.innerHTML = renderLogin(); bindLoginEvents(); }
-  else { root.innerHTML = renderStudentApp(); bindAppEvents(); loadTodayEntry(); }
+// === RENDER ===
+function render(){
+  var root=document.getElementById('app');
+  var nav=document.getElementById('bottom-nav');
+  if(!currentUser){nav.style.display='none';root.innerHTML=renderLogin();bindLoginEvents();}
+  else{nav.style.display='flex';root.innerHTML=renderApp();bindAppEvents();loadCurrentSection();}
 }
 
-function renderLogin() {
-  return '<div class="login-wrapper"><div class="login-card">' +
-    '<h1>Connecte-toi avec ton <em>email</em></h1>' +
-    '<p class="sub">Pas de mot de passe — entre ton email et ton prénom</p>' +
-    '<div id="login-error"></div>' +
-    '<div class="field"><label>Email</label><input type="email" id="login-email" placeholder="ton@email.com" autofocus></div>' +
-    '<div class="field"><label>Prénom</label><input type="text" id="login-name" placeholder="Jean"></div>' +
-    '<div class="field"><label>Nom</label><input type="text" id="login-last" placeholder="Dupont"></div>' +
-    '<button class="btn-enter" id="btn-login">Entrer →</button>' +
-    '<p class="sub-info">Première connexion ? Ton compte sera créé automatiquement.</p>' +
-    '</div></div>';
+// === SMART LOGIN UI ===
+function renderLogin(){
+  var savedEmail=localStorage.getItem('dj_saved_email')||'';
+  return '<div class="login-wrapper"><div class="login-card">'+
+    '<h1>Connecte-toi avec ton <em>email</em></h1>'+
+    '<p class="sub">Entre ton adresse mail — on reconnaît ton compte automatiquement</p>'+
+    '<div id="login-error"></div>'+
+    '<div id="login-msg" style="display:none;text-align:center;padding:8px;margin-bottom:8px;font-size:13px;border-radius:var(--r-sm)"></div>'+
+    '<div class="field"><label>Email</label><input type="email" id="login-email" placeholder="ton@email.com" autocomplete="email" autofocus value="'+escAttr(savedEmail)+'"></div>'+
+    '<div id="name-fields">'+
+      '<div class="field"><label>Prénom</label><input type="text" id="login-name" placeholder="Jean" autocomplete="given-name"></div>'+
+      '<div class="field"><label>Nom</label><input type="text" id="login-last" placeholder="Dupont" autocomplete="family-name"></div>'+
+    '</div>'+
+    '<button class="btn-enter" id="btn-login">Continuer →</button>'+
+    '<p class="sub2" id="login-hint">Première fois ? Ton compte sera créé</p>'+
+  '</div></div>';
 }
 
-function renderStudentApp() {
-  var u = currentUser;
-  return '<div class="app">' +
-    '<header class="app-header">' +
-    '<div class="app-brand">Tracking</div>' +
-    '<button class="user-chip" id="btn-logout">' + u.first_name + ' ↵</button>' +
-    '</header>' +
-    '<main class="app-main">' +
-    '<div id="msg-area"></div>' +
-    '<h1 class="page-id">Ma <em>fiche</em></h1>' +
-    '<p class="today-date" id="today-display"></p>' +
-    '<div class="card-today">' +
-    '<div class="badge-pulse">Aujourd\'hui — à remplir</div>' +
-    '<h2 id="entry-date-title"></h2>' +
-    '<div class="field-row">' +
-    '<div class="field"><label>Calls</label><input type="number" id="field-calls" min="0" value="0"></div>' +
-    '<div class="field"><label>DM</label><input type="number" id="field-dm" min="0" value="0"></div>' +
-    '</div>' +
-    '<div class="field-row">' +
-    '<div class="field"><label>Vidéos</label><input type="number" id="field-videos" min="0" value="0"></div>' +
-    '<div class="field"><label>CA (€)</label><input type="number" id="field-ca" min="0" step="0.01" value="0"></div>' +
-    '</div>' +
-    '<div class="live-toggle">' +
-    '<span style="font-weight:600;color:var(--ink-2)">Live</span>' +
-    '<button id="btn-live-no" class="active">Non</button>' +
-    '<button id="btn-live-yes">Oui</button>' +
-    '</div>' +
-    '<button class="btn-save" id="btn-save">Enregistrer ma fiche</button>' +
-    '</div>' +
-    '<div class="recap" id="recap-area"></div>' +
-    '<div class="history-section">' +
-    '<h3>Historique récent</h3>' +
-    '<div id="history-table"></div>' +
-    '</div>' +
-    '</main>' +
+function bindLoginEvents(){
+  var emailField=document.getElementById('login-email');
+  var nameFields=document.getElementById('name-fields');
+  var hint=document.getElementById('login-hint');
+  var msg=document.getElementById('login-msg');
+  var checking=false;
+
+  // Check email on blur
+  emailField.addEventListener('blur',async function(){
+    var email=emailField.value.trim();
+    if(!email||checking)return;
+    checking=true;
+    try{
+      var data=await checkEmail(email);
+      if(data&&data.student){
+        // Returning user - hide name fields, show welcome
+        nameFields.style.display='none';
+        msg.style.display='block';
+        msg.style.background='rgba(39,166,68,0.1)';
+        msg.style.color='#27a644';
+        msg.textContent='👋 Re-bonjour '+data.student.first_name+' ! Clique pour entrer';
+        hint.textContent='Tu es déjà inscrit — connecte-toi directement';
+        document.getElementById('btn-login').textContent='Entrer →';
+      }else{
+        // New user
+        nameFields.style.display='block';
+        msg.style.display='block';
+        msg.style.background='var(--ember-soft)';
+        msg.style.color='var(--ember)';
+        msg.textContent='✨ Nouveau ! Remplis ton prénom et ton nom';
+        hint.textContent='Première connexion — ton compte sera créé';
+        document.getElementById('btn-login').textContent='Créer mon compte →';
+      }
+    }catch(e){
+      nameFields.style.display='block';
+      hint.textContent='Première connexion ? Ton compte sera créé';
+    }
+    checking=false;
+  });
+
+  // Quick enter: if fields hidden, login directly on button click
+  document.getElementById('btn-login').addEventListener('click',async function(){
+    var email=emailField.value.trim();
+    if(!email)return;
+    var name=document.getElementById('login-name')?document.getElementById('login-name').value.trim():'';
+    var last=document.getElementById('login-last')?document.getElementById('login-last').value.trim():'';
+
+    // If name fields hidden, user is returning
+    if(nameFields.style.display==='none'||nameFields.offsetHeight===0){
+      name='_AUTO_';last='_AUTO_';
+    }
+    if(!name||!last){
+      nameFields.style.display='block';
+      document.getElementById('login-error').innerHTML='<div class="error-msg">Entre ton prénom et ton nom</div>';
+      return;
+    }
+
+    var btn=document.getElementById('btn-login');
+    btn.disabled=true;btn.textContent='Connexion...';
+    try{
+      localStorage.setItem('dj_saved_email',email);
+      await login(email,name,last);
+    }catch(e){
+      document.getElementById('login-error').innerHTML='<div class="error-msg">'+e.message+'</div>';
+      btn.disabled=false;btn.textContent='Continuer →';
+    }
+  });
+
+  // Enter key
+  emailField.addEventListener('keydown',function(e){
+    if(e.key==='Enter')document.getElementById('btn-login').click();
+  });
+}
+
+// === APP UI ===
+function renderApp(){
+  return '<div class="app">'+
+    '<header class="app-header">'+
+      '<div class="app-brand">Tracking</div>'+
+      '<button class="user-chip" id="btn-logout">'+esc(currentUser.first_name)+' ↵</button>'+
+    '</header>'+
+    '<main class="app-main">'+
+      '<div id="msg-area"></div>'+
+      // FICHE SECTION
+      '<div id="section-fiche" class="section active">'+
+        '<h1 class="page-id">Ma <em>fiche</em></h1>'+
+        '<p class="today-date" id="today-display"></p>'+
+        '<div class="card-today">'+
+          '<div class="badge-pulse">Aujourd\'hui — à remplir</div>'+
+          '<div class="date-nav">'+
+            '<button id="btn-prev">◀</button>'+
+            '<span class="date-display" id="date-display"></span>'+
+            '<button id="btn-next">▶</button>'+
+            '<button class="today-btn" id="btn-today">Aujourd\'hui</button>'+
+          '</div>'+
+          '<div class="field-row">'+
+            '<div class="field"><label>Calls</label><input type="number" id="field-calls" min="0" value="0" inputmode="numeric"></div>'+
+            '<div class="field"><label>DM</label><input type="number" id="field-dm" min="0" value="0" inputmode="numeric"></div>'+
+          '</div>'+
+          '<div class="field-row">'+
+            '<div class="field"><label>Vidéos</label><input type="number" id="field-videos" min="0" value="0" inputmode="numeric"></div>'+
+            '<div class="field"><label>CA (€)</label><input type="number" id="field-ca" min="0" step="0.01" value="0" inputmode="decimal"></div>'+
+          '</div>'+
+          '<div class="live-toggle">'+
+            '<span class="live-label"><span class="live-icon" id="live-icon"></span>Live</span>'+
+            '<button id="btn-live-no" class="active">Non</button>'+
+            '<button id="btn-live-yes">Oui</button>'+
+          '</div>'+
+          '<button class="btn-save" id="btn-save">Enregistrer ma fiche</button>'+
+          '<p style="font-size:11px;color:var(--ink-4);margin-top:8px;text-align:center" id="lockout-msg"></p>'+
+        '</div>'+
+        '<div class="recap" id="recap-area"></div>'+
+        '<div class="history-section">'+
+          '<h3>Historique récent</h3><div id="history-table"></div>'+
+        '</div>'+
+      '</div>'+
+      // BIBLIO SECTION
+      '<div id="section-biblio" class="section">'+
+        '<h1 class="page-id">Biblio<em>thèque</em></h1>'+
+        '<p class="today-date">Ressources pour ta progression</p>'+
+        '<div id="biblio-content"></div>'+
+      '</div>'+
+      // QUESTIONS SECTION
+      '<div id="section-questions" class="section">'+
+        '<h1 class="page-id">Tes <em>questions</em></h1>'+
+        '<p class="today-date">Pose une question au coach</p>'+
+        '<div class="ask-box">'+
+          '<textarea id="q-text" placeholder="Écris ta question ici..."></textarea>'+
+          '<button class="btn-enter" id="btn-ask" style="margin-top:12px">Envoyer ma question →</button>'+
+        '</div>'+
+        '<div id="questions-list"></div>'+
+      '</div>'+
+      // STATS SECTION
+      '<div id="section-stats" class="section">'+
+        '<h1 class="page-id">Mes <em>stats</em></h1>'+
+        '<p class="today-date">Vue d\'ensemble de ta progression</p>'+
+        '<div id="stats-content"></div>'+
+      '</div>'+
+    '</main>'+
+  '</div>';
+}
+
+function bindAppEvents(){
+  document.getElementById('btn-logout').addEventListener('click',logout);
+  document.getElementById('btn-save').addEventListener('click',saveEntry);
+  document.getElementById('btn-live-yes').addEventListener('click',function(){toggleLive(true);});
+  document.getElementById('btn-live-no').addEventListener('click',function(){toggleLive(false);});
+  document.getElementById('btn-prev').addEventListener('click',function(){changeDate(-1);});
+  document.getElementById('btn-next').addEventListener('click',function(){changeDate(1);});
+  document.getElementById('btn-today').addEventListener('click',function(){selectedDate=new Date().toISOString().slice(0,10);loadTodayEntry();});
+  document.getElementById('btn-ask').addEventListener('click',askQuestion);
+  // Bottom nav
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      currentPage=this.dataset.page;
+      document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+      document.getElementById('section-'+currentPage).classList.add('active');
+      loadCurrentSection();
+    });
+  });
+}
+
+function changeDate(delta){
+  var d=new Date(selectedDate+'T12:00:00');
+  d.setDate(d.getDate()+delta);
+  var today=new Date();today.setHours(0,0,0,0);
+  if(d>today){d=today;}
+  selectedDate=d.toISOString().slice(0,10);
+  loadTodayEntry();
+}
+
+// === LOAD ===
+async function loadTodayEntry(){
+  if(currentPage!=='fiche')return;
+  var data=await apiCall('GET','/me/entries/'+selectedDate);
+  if(!data){return;}
+  document.getElementById('field-calls').value=data.calls||0;
+  document.getElementById('field-dm').value=data.dm||0;
+  document.getElementById('field-videos').value=data.videos||0;
+  document.getElementById('field-ca').value=data.ca_eur||0;
+  toggleLive(data.live||false);
+  document.getElementById('date-display').textContent=formatDate(selectedDate);
+
+  // Lockout check
+  var today=new Date();today.setHours(0,0,0,0);
+  var lockoutDate=new Date(today);lockoutDate.setDate(lockoutDate.getDate()-3);
+  var isLocked=new Date(selectedDate+'T12:00:00')<lockoutDate;
+  var fields=['field-calls','field-dm','field-videos','field-ca','btn-live-yes','btn-live-no','btn-save'];
+  fields.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.disabled=isLocked;
+  });
+  document.getElementById('lockout-msg').textContent=isLocked?'🔒 Cette date a plus de 3 jours — non modifiable':'';
+  document.getElementById('badge-pulse')?document.getElementById('badge-pulse').textContent=isLocked?'Verrouillée':'Aujourd\'hui — à remplir':null;
+
+  updateRecap(data);
+  document.getElementById('today-display').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+  // History
+  var history=await apiCall('GET','/me/history');
+  var rows='';
+  if(history&&history.length>0){
+    history.slice(0,20).forEach(function(e){
+      var pts=(e.calls||0)*2+(e.dm||0)+(e.videos||0)*3+(e.live?5:0);
+      rows+='<tr><td>'+e.entry_date+'</td><td>'+(e.calls||0)+'</td><td>'+(e.dm||0)+'</td><td>'+(e.videos||0)+'</td><td>'+(e.live?'Oui':'—')+'</td><td>'+(e.ca_eur||0).toFixed(2)+'€</td><td><strong>'+pts+'</strong></td></tr>';
+    });
+  }
+  document.getElementById('history-table').innerHTML=rows?'<table class="history-table"><thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty-state">Aucune fiche</div>';
+}
+
+// === LIVE TOGGLE (fixed) ===
+function toggleLive(val){
+  window._live=val;
+  var icon=document.getElementById('live-icon');
+  if(icon){icon.className='live-icon'+(val?' active':'');}
+  document.getElementById('btn-live-yes').className=val?'active':'';
+  document.getElementById('btn-live-no').className=val?'':'active';
+}
+
+// === RECAP ===
+function updateRecap(data){
+  var calls=data.calls||0,dm=data.dm||0,videos=data.videos||0,live=data.live||false;
+  var points=calls*2+dm+videos*3+(live?5:0),ca=data.ca_eur||0;
+  document.getElementById('recap-area').innerHTML='<h3>Récapitulatif</h3>'+
+    '<div class="recap-row"><span class="recap-label">Calls</span><span class="recap-value">'+calls+' × 2 = '+(calls*2)+' pts</span></div>'+
+    '<div class="recap-row"><span class="recap-label">DM</span><span class="recap-value">'+dm+' × 1 = '+dm+' pts</span></div>'+
+    '<div class="recap-row"><span class="recap-label">Vidéos</span><span class="recap-value">'+videos+' × 3 = '+(videos*3)+' pts</span></div>'+
+    '<div class="recap-row"><span class="recap-label">Live</span><span class="recap-value">'+(live?'Oui (+5 pts)':'Non')+'</span></div>'+
+    (ca>0?'<div class="recap-row"><span class="recap-label">CA généré</span><span class="recap-value">'+ca.toFixed(2)+' €</span></div>':'')+
+    '<div class="recap-points">'+points+' pts</div>';
+}
+
+// === SAVE ===
+async function saveEntry(){
+  var btn=document.getElementById('btn-save');
+  btn.disabled=true;btn.textContent='Enregistrement...';
+  var data={
+    calls:parseInt(document.getElementById('field-calls').value)||0,
+    dm:parseInt(document.getElementById('field-dm').value)||0,
+    videos:parseInt(document.getElementById('field-videos').value)||0,
+    live:window._live||false,
+    ca_eur:parseFloat(document.getElementById('field-ca').value)||0
+  };
+  var res=await apiCall('PUT','/me/entries/'+selectedDate,data);
+  btn.disabled=false;btn.textContent='Enregistrer ma fiche';
+  if(res&&res.id){
+    document.getElementById('msg-area').innerHTML='<div class="success-msg">✓ Fiche enregistrée !</div>';
+    updateRecap(res);
+    loadTodayEntry();
+    setTimeout(function(){document.getElementById('msg-area').innerHTML='';},3000);
+  }else{
+    document.getElementById('msg-area').innerHTML='<div class="error-msg">'+(res&&res.error?res.error:'Erreur lors de l\'enregistrement')+'</div>';
+    setTimeout(function(){document.getElementById('msg-area').innerHTML='';},4000);
+  }
+}
+
+// === BIBLIO ===
+function renderBiblio(){
+  var items=[
+    {title:'Maîtriser l\'appel de closing',desc:'Les 5 techniques pour transformer un DM en call qualifié.',tag:'video',icon:'🎥'},
+    {title:'Structure DM haute conversion',desc:'Template de DM qui génère 40% de réponse. Format court + CTA.',tag:'article',icon:'📄'},
+    {title:'Calculateur de points',desc:'Simule ton score quotidien et visualise ta progression.',tag:'outil',icon:'🧮'},
+    {title:'Les scripts DJAELYS',desc:'Scripts complets pour chaque étape du funnel de vente.',tag:'article',icon:'📜'},
+    {title:'Passer de 0 à 100 appels/jour',desc:'Guide progressif pour augmenter ton volume sans te brûler.',tag:'video',icon:'🎥'},
+    {title:'Gérer les objections',desc:'Les 7 objections les plus fréquentes et comment les retourner.',tag:'video',icon:'🎥'}
+  ];
+  document.getElementById('biblio-content').innerHTML=items.map(function(item){
+    return '<div class="lib-card">'+
+      '<h4>'+item.icon+' '+esc(item.title)+'</h4>'+
+      '<p>'+esc(item.desc)+'</p>'+
+      '<span class="lib-tag '+item.tag+'">'+item.tag.toUpperCase()+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+// === QUESTIONS ===
+async function loadQuestions(){
+  var questions=JSON.parse(localStorage.getItem('dj_questions')||'[]');
+  if(questions.length===0){
+    document.getElementById('questions-list').innerHTML='<div class="empty-state">Pas encore de questions. Écris la première 👆</div>';
+    return;
+  }
+  document.getElementById('questions-list').innerHTML=questions.slice().reverse().map(function(q){
+    return '<div class="question-card">'+
+      '<div class="q-header">'+
+        '<span class="q-date">'+q.date+'</span>'+
+        '<span class="q-status '+(q.answered?'answered':'pending')+'">'+(q.answered?'Répondu':'En attente')+'</span>'+
+      '</div>'+
+      '<p style="font-size:14px;color:var(--ink)">'+esc(q.text)+'</p>'+
+      (q.answer?'<p style="font-size:13px;color:var(--plum);margin-top:8px;padding:8px;background:var(--plum-soft);border-radius:var(--r-sm)">💡 '+esc(q.answer)+'</p>':'')+
+    '</div>';
+  }).join('');
+}
+
+async function askQuestion(){
+  var text=document.getElementById('q-text').value.trim();
+  if(!text)return;
+  var questions=JSON.parse(localStorage.getItem('dj_questions')||'[]');
+  questions.push({text:text,date:new Date().toISOString().slice(0,10),answered:false,answer:null});
+  localStorage.setItem('dj_questions',JSON.stringify(questions));
+  document.getElementById('q-text').value='';
+  document.getElementById('msg-area').innerHTML='<div class="success-msg">✓ Question envoyée ! Le coach te répondra.</div>';
+  setTimeout(function(){document.getElementById('msg-area').innerHTML='';},3000);
+  loadQuestions();
+}
+
+// === STATS ===
+function renderStats(){
+  var history=JSON.parse(localStorage.getItem('dj_cached_history')||'[]');
+  if(history.length===0){
+    document.getElementById('stats-content').innerHTML='<div class="empty-state">Pas assez de données. Remplis ta fiche d\'abord !</div>';
+    return;
+  }
+  var totalPts=history.reduce(function(s,e){return s+(e.calls||0)*2+(e.dm||0)+(e.videos||0)*3+(e.live?5:0);},0);
+  var totalCA=history.reduce(function(s,e){return s+(e.ca_eur||0);},0);
+  var totalCalls=history.reduce(function(s,e){return s+(e.calls||0);},0);
+  var totalVideos=history.reduce(function(s,e){return s+(e.videos||0);},0);
+  var liveDays=history.filter(function(e){return e.live;}).length;
+
+  document.getElementById('stats-content').innerHTML=
+    '<div class="stats-grid">'+
+      '<div class="stat-card"><div class="stat-num">'+totalPts+'</div><div class="stat-label">Points totaux</div></div>'+
+      '<div class="stat-card"><div class="stat-num">'+totalCA.toFixed(0)+'€</div><div class="stat-label">CA cumulé</div></div>'+
+      '<div class="stat-card"><div class="stat-num">'+totalCalls+'</div><div class="stat-label">Calls totaux</div></div>'+
+      '<div class="stat-card"><div class="stat-num">'+totalVideos+'</div><div class="stat-label">Vidéos postées</div></div>'+
+      '<div class="stat-card"><div class="stat-num">'+history.length+'</div><div class="stat-label">Jours actifs</div></div>'+
+      '<div class="stat-card"><div class="stat-num">'+liveDays+'</div><div class="stat-label">Jours en live</div></div>'+
+    '</div>'+
+    '<div class="card-today" style="border-color:var(--line)">'+
+      '<h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:16px">Moyennes par jour</h3>'+
+      '<div class="stat-bar"><span class="bar-label">Calls</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,(totalCalls/history.length/10)*100)+'%"></div></div><span class="bar-val">'+(totalCalls/history.length).toFixed(1)+'</span></div>'+
+      '<div class="stat-bar"><span class="bar-label">DM</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,(history.reduce(function(s,e){return s+(e.dm||0)},0)/history.length/5)*100)+'%"></div></div><span class="bar-val">'+(history.reduce(function(s,e){return s+(e.dm||0)},0)/history.length).toFixed(1)+'</span></div>'+
+      '<div class="stat-bar"><span class="bar-label">Vidéos</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,(totalVideos/history.length/2)*100)+'%"></div></div><span class="bar-val">'+(totalVideos/history.length).toFixed(1)+'</span></div>'+
+      '<div class="stat-bar"><span class="bar-label">Live</span><div class="bar-track"><div class="bar-fill" style="width:'+((liveDays/history.length)*100)+'%"></div></div><span class="bar-val">'+((liveDays/history.length)*100).toFixed(0)+'%</span></div>'+
+      '<div class="stat-bar"><span class="bar-label">Points</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,(totalPts/history.length/20)*100)+'%"></div></div><span class="bar-val">'+(totalPts/history.length).toFixed(1)+'</span></div>'+
     '</div>';
 }
 
-function bindLoginEvents() {
-  document.getElementById('btn-login').addEventListener('click', async () => {
-    var email = document.getElementById('login-email').value.trim();
-    var name = document.getElementById('login-name').value.trim();
-    var last = document.getElementById('login-last').value.trim();
-    if (!email || !name || !last) return;
-    try {
-      await login(email, name, last);
-    } catch(e) {
-      document.getElementById('login-error').innerHTML = '<div class="error-msg">' + e.message + '</div>';
-    }
-  });
-  document.getElementById('login-last').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') document.getElementById('btn-login').click();
-  });
-}
-
-function bindAppEvents() {
-  document.getElementById('btn-logout').addEventListener('click', logout);
-  document.getElementById('btn-save').addEventListener('click', saveEntry);
-  document.getElementById('btn-live-yes').addEventListener('click', function() { toggleLive(true); });
-  document.getElementById('btn-live-no').addEventListener('click', function() { toggleLive(false); });
-}
-
-async function loadTodayEntry() {
-  var data = await apiCall('GET', '/me/today');
-  if (!data) return;
-  document.getElementById('field-calls').value = data.calls || 0;
-  document.getElementById('field-dm').value = data.dm || 0;
-  document.getElementById('field-videos').value = data.videos || 0;
-  document.getElementById('field-ca').value = data.ca_eur || 0;
-  toggleLive(data.live || false);
-  document.getElementById('entry-date-title').textContent = data.entry_date || new Date().toISOString().slice(0,10);
-  updateRecap(data);
-  var today = new Date();
-  document.getElementById('today-display').textContent = today.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
-
-  var history = await apiCall('GET', '/me/history');
-  if (history && history.length > 0) {
-    var rows = '';
-    history.slice(0, 14).forEach(function(e) {
-      var pts = (e.calls||0)*2 + (e.dm||0) + (e.videos||0)*3 + (e.live ? 5 : 0);
-      rows += '<tr>' +
-        '<td>' + e.entry_date + '</td>' +
-        '<td>' + (e.calls||0) + '</td><td>' + (e.dm||0) + '</td><td>' + (e.videos||0) + '</td>' +
-        '<td>' + (e.live ? 'Oui' : '—') + '</td>' +
-        '<td>' + (e.ca_eur||0).toFixed(2) + '€</td>' +
-        '<td><strong>' + pts + '</strong></td>' +
-        '</tr>';
+// === SECTION LOADER ===
+function loadCurrentSection(){
+  if(currentPage==='biblio')renderBiblio();
+  if(currentPage==='questions')loadQuestions();
+  if(currentPage==='stats'){
+    // Cache history for stats
+    apiCall('GET','/me/history').then(function(h){
+      if(h)localStorage.setItem('dj_cached_history',JSON.stringify(h));
+      renderStats();
     });
-    document.getElementById('history-table').innerHTML = '<table class="history-table">' +
-      '<thead><tr><th>Date</th><th>Calls</th><th>DM</th><th>Vidéos</th><th>Live</th><th>CA</th><th>Pts</th></tr></thead>' +
-      '<tbody>' + rows + '</tbody></table>';
   }
 }
 
-function toggleLive(val) {
-  window._live = val;
-  document.getElementById('btn-live-yes').className = val ? 'active' : '';
-  document.getElementById('btn-live-no').className = val ? '' : 'active';
-}
+// === HELPERS ===
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function formatDate(d){var dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}
 
-function updateRecap(data) {
-  var calls = data.calls || 0, dm = data.dm || 0, videos = data.videos || 0, live = data.live || false;
-  var points = calls*2 + dm + videos*3 + (live ? 5 : 0), ca = data.ca_eur || 0;
-  document.getElementById('recap-area').innerHTML = '<h3>Récapitulatif</h3>' +
-    '<div class="recap-row"><span class="recap-label">Calls</span><span class="recap-value">' + calls + ' × 2 = ' + (calls*2) + ' pts</span></div>' +
-    '<div class="recap-row"><span class="recap-label">DM</span><span class="recap-value">' + dm + ' × 1 = ' + dm + ' pts</span></div>' +
-    '<div class="recap-row"><span class="recap-label">Vidéos</span><span class="recap-value">' + videos + ' × 3 = ' + (videos*3) + ' pts</span></div>' +
-    '<div class="recap-row"><span class="recap-label">Live</span><span class="recap-value">' + (live ? 'Oui (+5 pts)' : 'Non') + '</span></div>' +
-    (ca > 0 ? '<div class="recap-row"><span class="recap-label">CA généré</span><span class="recap-value">' + ca.toFixed(2) + ' €</span></div>' : '') +
-    '<div class="recap-points">' + points + ' pts</div>';
-}
-
-async function saveEntry() {
-  var btn = document.getElementById('btn-save');
-  btn.disabled = true; btn.textContent = 'Enregistrement...';
-  var data = {
-    calls: parseInt(document.getElementById('field-calls').value)||0,
-    dm: parseInt(document.getElementById('field-dm').value)||0,
-    videos: parseInt(document.getElementById('field-videos').value)||0,
-    live: window._live||false,
-    ca_eur: parseFloat(document.getElementById('field-ca').value)||0
-  };
-  var res = await apiCall('PUT', '/me/entries/' + new Date().toISOString().slice(0,10), data);
-  btn.disabled = false; btn.textContent = 'Enregistrer ma fiche';
-  if (res && res.id) {
-    document.getElementById('msg-area').innerHTML = '<div class="success-msg">✓ Fiche enregistrée !</div>';
-    updateRecap(res);
-    setTimeout(function() { document.getElementById('msg-area').innerHTML = ''; }, 3000);
-  } else {
-    document.getElementById('msg-area').innerHTML = '<div class="error-msg">' + (res && res.detail ? res.detail : 'Erreur') + '</div>';
-  }
-}
-
-// Init
-var savedUser = localStorage.getItem('dj_user');
-var savedToken = localStorage.getItem('dj_token');
-if (savedUser && savedToken) { currentUser = JSON.parse(savedUser); }
+// === INIT ===
+var savedUser=localStorage.getItem('dj_user');
+var savedToken=localStorage.getItem('dj_token');
+if(savedUser&&savedToken){currentUser=JSON.parse(savedUser);}
 render();
 </script>
 </body>
