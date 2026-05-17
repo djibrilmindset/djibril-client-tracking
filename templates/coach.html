@@ -28,6 +28,56 @@
   .status-missing { background:var(--ink-4) }
   .btn-back { display:inline-block; padding:8px 18px; border:1px solid var(--line-strong); border-radius:var(--r-pill); font-size:13px; font-weight:600; cursor:pointer; background:var(--paper-soft); color:var(--ink-3); text-decoration:none }
   .btn-back:hover { background:var(--paper-deep) }
+
+  /* ── PHASE 2 : Q&A AWAITING + SIMILARITY ── */
+  .qa-pending-section { margin-top:48px; padding-top:24px; border-top:2px solid var(--line-strong) }
+  .qa-pending-section h2 { display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+  .qa-pending-section h2 .count { background:var(--ember); color:#fff; font-size:13px; padding:3px 10px; border-radius:999px; font-weight:600 }
+  .qa-card { background:var(--paper-soft); border:1px solid var(--line); border-radius:var(--r-md); padding:18px 18px 14px; margin-bottom:16px }
+  .qa-card__head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap }
+  .qa-card__head .who { font-weight:700; color:var(--ink); font-size:15px }
+  .qa-card__head .when { font-size:11px; color:var(--ink-4); font-family:ui-monospace,monospace }
+  .qa-card__head .lvl { font-size:11px; background:var(--plum-soft); color:var(--plum); padding:2px 8px; border-radius:999px; font-weight:600 }
+  .qa-card__head .tags { font-size:10px; color:var(--ink-4); font-family:ui-monospace,monospace; letter-spacing:0.04em }
+  .qa-card__q { font-size:16px; line-height:1.5; color:var(--ink); font-style:italic; margin:8px 0 10px; padding-left:12px; border-left:3px solid var(--ember) }
+  .qa-card__synth { display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; font-size:13px; line-height:1.4; color:var(--ink-3); margin-bottom:12px; padding:10px 12px; background:rgba(0,0,0,0.02); border-radius:6px }
+  @media(max-width:700px){ .qa-card__synth { grid-template-columns:1fr } }
+  .qa-card__synth div b { color:var(--ink); font-size:10px; text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:2px }
+  .qa-actions-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+  .qa-btn { padding:8px 14px; font-size:12px; font-weight:600; border-radius:var(--r-pill); cursor:pointer; border:1px solid var(--line-strong); background:var(--paper-soft); color:var(--ink-3); transition:all 0.15s }
+  .qa-btn:hover { background:var(--ember-soft); border-color:var(--ember); color:var(--ember) }
+  .qa-btn--primary { background:var(--ember); color:#fff; border-color:var(--ember) }
+  .qa-btn--primary:hover { background:var(--ember); filter:brightness(0.92) }
+
+  /* SIMILARITY PANEL */
+  .sim-panel { margin-top:14px; padding:14px; background:rgba(255,255,255,0.6); border:1px dashed var(--line-strong); border-radius:8px }
+  .sim-summary { font-size:12px; color:var(--ink-3); margin-bottom:10px; font-family:ui-monospace,monospace }
+  .sim-summary b { color:var(--ink); font-family:var(--font-display) }
+  .sim-match { padding:10px 12px; background:#fff; border:1px solid var(--line); border-radius:6px; margin-bottom:8px }
+  .sim-match__head { display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap }
+  .sim-match__score { font-family:ui-monospace,monospace; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px }
+  .sim-match__score.match_100 { background:#16a34a; color:#fff }   /* vert — réutilisable tel quel */
+  .sim-match__score.match_90  { background:#65a30d; color:#fff }   /* vert clair */
+  .sim-match__score.match_60  { background:#f59e0b; color:#fff }   /* orange — adapter */
+  .sim-match__score.match_0   { background:#94a3b8; color:#fff }   /* gris — non pertinent */
+  .sim-match__q { font-size:13px; color:var(--ink); font-style:italic; line-height:1.4 }
+  .sim-match__a { font-size:13px; color:var(--ink-3); margin-top:6px; line-height:1.5; max-height:90px; overflow:hidden; position:relative }
+  .sim-match__a.expanded { max-height:none }
+  .sim-match__a:not(.expanded)::after { content:""; position:absolute; bottom:0; left:0; right:0; height:30px; background:linear-gradient(transparent, #fff) }
+  .sim-match__actions { display:flex; gap:6px; margin-top:8px }
+  .sim-match__btn { padding:5px 10px; font-size:11px; border-radius:6px; cursor:pointer; border:1px solid var(--line-strong); background:#fff; color:var(--ink-3) }
+  .sim-match__btn:hover { background:var(--ember-soft); border-color:var(--ember); color:var(--ember) }
+
+  /* COMPOSE ANSWER */
+  .compose-box { margin-top:14px; padding:14px; background:#fff; border:1.5px solid var(--ember); border-radius:8px }
+  .compose-box textarea { width:100%; min-height:120px; padding:10px; font-family:var(--font-serif); font-size:14px; line-height:1.5; border:1px solid var(--line); border-radius:4px; outline:none; resize:vertical }
+  .compose-box textarea:focus { border-color:var(--ember) }
+  .compose-box .compose-meta { display:flex; gap:14px; align-items:center; margin-top:10px; flex-wrap:wrap }
+  .compose-box .compose-meta label { font-size:11px; color:var(--ink-4); letter-spacing:0.04em; display:flex; align-items:center; gap:6px }
+  .compose-box .compose-meta input[type=number] { width:60px; padding:4px 6px; font-family:ui-monospace,monospace; border:1px solid var(--line); border-radius:4px }
+  .compose-box .compose-meta input[type=checkbox] { accent-color:var(--ember) }
+
+  .hidden { display:none !important }
   .audit-log { background:#1a1614; color:#d4ccc4; border-radius:var(--r-md); padding:20px; font-family:var(--font-mono); font-size:12px; max-height:400px; overflow-y:auto; margin-top:16px; line-height:1.6 }
   .audit-line { padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05) }
   .empty-state { text-align:center; padding:48px; color:var(--ink-4) }
@@ -41,14 +91,43 @@
 
 <script>
 const API = './api/coach';
+const SUPABASE_URL = 'https://nbnbsljqtolzzuqnkyae.supabase.co';
+const QA_BASE = SUPABASE_URL + '/functions/v1/qa-handler';
 let students = [];
+let qaPending = []; // questions awaiting_djibril
+
+function getCoachKey() {
+  let k = localStorage.getItem('dj_coach_key');
+  if (!k) {
+    k = prompt('🔐 Coach key (saisie 1× — sauvegardée localStorage)');
+    if (k) localStorage.setItem('dj_coach_key', k.trim());
+  }
+  return k;
+}
+
+async function qaFetch(path, method='GET', body=null) {
+  const k = getCoachKey();
+  if (!k) return { error: 'no_coach_key' };
+  const opts = { method, headers: { 'x-djibril-key': k, 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(QA_BASE + path, opts);
+    return await r.json();
+  } catch (e) {
+    return { error: e.message };
+  }
+}
 
 async function load() {
   document.getElementById('app').innerHTML = '<div class="app-c" style="text-align:center;padding:80px">Chargement...</div>';
-  const res = await fetch(API + '/students');
-  students = await res.json();
-  const stats = await fetch(API + '/stats').then(r => r.json());
-  renderList(stats);
+  const [studentsRes, statsRes, qaRes] = await Promise.all([
+    fetch(API + '/students').then(r => r.json()).catch(() => []),
+    fetch(API + '/stats').then(r => r.json()).catch(() => ({})),
+    qaFetch('/qa/coach/awaiting'),
+  ]);
+  students = studentsRes || [];
+  qaPending = (qaRes && qaRes.questions) || [];
+  renderList(statsRes || {});
 }
 
 function renderList(stats) {
@@ -78,7 +157,153 @@ function renderList(stats) {
     </div>
     <h2 class="section-title">Liste</h2>
     ${students.length > 0 ? `<table><thead><tr><th>Nom</th><th>Email</th><th>Aujourd'hui</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty-state">Aucun élève</div>'}
+
+    ${renderQaPending()}
   </div>`;
+
+  // After DOM update, wire qa-card actions
+  document.querySelectorAll('[data-qa-suggest]').forEach(btn => {
+    btn.addEventListener('click', () => loadSuggestions(btn.dataset.qaSuggest));
+  });
+  document.querySelectorAll('[data-qa-compose]').forEach(btn => {
+    btn.addEventListener('click', () => toggleCompose(btn.dataset.qaCompose));
+  });
+}
+
+function renderQaPending() {
+  if (!qaPending || qaPending.length === 0) {
+    return `<div class="qa-pending-section">
+      <h2 class="section-title">Questions en attente <span class="count">0</span></h2>
+      <div class="empty-state" style="padding:24px;color:var(--ink-4)">Aucune question creusée en attente. ✨</div>
+    </div>`;
+  }
+  const cards = qaPending.map(q => {
+    const synth = q.synthesis || {};
+    const student = q.student || {};
+    const dt = new Date(q.created_at).toLocaleString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    return `<div class="qa-card" id="qa-card-${q.id}">
+      <div class="qa-card__head">
+        <span class="who">${escapeHtml(student.first_name || '?')}</span>
+        <span class="when">${dt}</span>
+        ${q.consciousness_level ? `<span class="lvl">Niveau ${q.consciousness_level}/5</span>` : ''}
+        ${(q.tags||[]).length ? `<span class="tags">· ${(q.tags||[]).slice(0,4).join(' · ')}</span>` : ''}
+      </div>
+      <div class="qa-card__q">${escapeHtml(q.qualified_question || q.initial_question)}</div>
+      ${synth.vraie_problematique || synth.vrai_besoin || synth.blocage_emotionnel ? `<div class="qa-card__synth">
+        ${synth.vraie_problematique ? `<div><b>Vraie problématique</b>${escapeHtml(synth.vraie_problematique)}</div>` : ''}
+        ${synth.vrai_besoin ? `<div><b>Vrai besoin</b>${escapeHtml(synth.vrai_besoin)}</div>` : ''}
+        ${synth.blocage_emotionnel ? `<div><b>Blocage</b>${escapeHtml(synth.blocage_emotionnel)}</div>` : ''}
+        ${synth.action_concrete_proposee ? `<div><b>Action proposée</b>${escapeHtml(synth.action_concrete_proposee)}</div>` : ''}
+      </div>` : ''}
+      <div class="qa-actions-row">
+        <button class="qa-btn qa-btn--primary" data-qa-suggest="${q.id}">🔍 Voir suggestions mémoire</button>
+        <button class="qa-btn" data-qa-compose="${q.id}">✍️ Rédiger réponse</button>
+      </div>
+      <div class="sim-panel hidden" id="sim-panel-${q.id}"></div>
+      <div class="compose-box hidden" id="compose-${q.id}"></div>
+    </div>`;
+  }).join('');
+  return `<div class="qa-pending-section">
+    <h2 class="section-title">Questions en attente <span class="count">${qaPending.length}</span></h2>
+    ${cards}
+  </div>`;
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadSuggestions(questionId) {
+  const panel = document.getElementById('sim-panel-' + questionId);
+  if (!panel) return;
+  panel.classList.remove('hidden');
+  panel.innerHTML = `<div class="sim-summary">⏳ Calcul similarité…</div>`;
+  const r = await qaFetch('/qa/coach/similar/' + questionId);
+  if (r.error) {
+    panel.innerHTML = `<div class="sim-summary">❌ Erreur : ${escapeHtml(r.error)}</div>`;
+    return;
+  }
+  const matches = r.matches || [];
+  const best = r.best_bucket || 'match_0';
+  const bestLabel = {
+    match_100: '🟢 Réponse quasi-identique en mémoire',
+    match_90:  '🟢 Très proche — réutiliser tel quel',
+    match_60:  '🟡 Pertinent — adapter + clarification',
+    match_0:   '⚪ Aucun match suffisant — rédiger neuf',
+  }[best];
+  if (matches.length === 0) {
+    panel.innerHTML = `<div class="sim-summary">⚪ Base KB vide (${r.kb_total||0}). Première réponse à rédiger.</div>`;
+    return;
+  }
+  const list = matches.map(m => {
+    const pct = Math.round(m.similarity * 100);
+    return `<div class="sim-match">
+      <div class="sim-match__head">
+        <span class="sim-match__score ${m.bucket}">${pct}%</span>
+        <span style="font-size:11px;color:var(--ink-4)">Pertinence KB : ${m.pertinence_score}/100</span>
+        ${m.tags && m.tags.length ? `<span style="font-size:10px;color:var(--ink-4);font-family:ui-monospace,monospace">${m.tags.slice(0,3).join(' · ')}</span>` : ''}
+      </div>
+      <div class="sim-match__q">${escapeHtml(m.question_summary || '')}</div>
+      <div class="sim-match__a" onclick="this.classList.toggle('expanded')">${escapeHtml(m.answer).replace(/\n/g, '<br>')}</div>
+      <div class="sim-match__actions">
+        <button class="sim-match__btn" onclick="reuseKb('${questionId}', '${m.kb_id}')">✓ Réutiliser tel quel</button>
+        <button class="sim-match__btn" onclick="adaptKb('${questionId}', '${m.kb_id}')">✎ Adapter + envoyer</button>
+      </div>
+    </div>`;
+  }).join('');
+  panel.innerHTML = `<div class="sim-summary"><b>${bestLabel}</b> · ${matches.length} match(s) sur ${r.kb_total} en mémoire</div>${list}`;
+}
+
+async function reuseKb(questionId, kbId) {
+  if (!confirm('Renvoyer cette réponse mémoire à l\'élève tel quel ?')) return;
+  const r = await qaFetch('/qa/coach/answer/' + questionId, 'POST', { reuse_kb_id: kbId });
+  if (r.error) { alert('Erreur : ' + r.error); return; }
+  alert('✓ Réponse envoyée. Élève recevra par mail.');
+  load();
+}
+
+function adaptKb(questionId, kbId) {
+  const match = (qaPending.find(q => q.id === questionId) || {});
+  // Get the answer text from the displayed sim-match
+  const panel = document.getElementById('sim-panel-' + questionId);
+  // Find the answer text for this kb
+  const btn = panel.querySelector(`[onclick*="${kbId}"]`);
+  const answerEl = btn ? btn.parentElement.previousElementSibling : null;
+  const seedAnswer = answerEl ? answerEl.textContent : '';
+  toggleCompose(questionId, seedAnswer);
+}
+
+function toggleCompose(questionId, seedAnswer='') {
+  const box = document.getElementById('compose-' + questionId);
+  if (!box) return;
+  if (!box.classList.contains('hidden') && !seedAnswer) {
+    box.classList.add('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <textarea id="answer-text-${questionId}" placeholder="Ta réponse à l'élève — sera envoyée par mail + visible sur sa fiche tracking">${escapeHtml(seedAnswer)}</textarea>
+    <div class="compose-meta">
+      <label>Pertinence <input type="number" id="answer-score-${questionId}" min="0" max="100" value="80"></label>
+      <label><input type="checkbox" id="answer-share-${questionId}" checked> Partager cohorte (ajouter au KB)</label>
+      <button class="qa-btn qa-btn--primary" onclick="sendAnswer('${questionId}')">✉️ Envoyer la réponse</button>
+      <button class="qa-btn" onclick="document.getElementById('compose-${questionId}').classList.add('hidden')">Annuler</button>
+    </div>
+  `;
+  document.getElementById('answer-text-' + questionId).focus();
+}
+
+async function sendAnswer(questionId) {
+  const answer = document.getElementById('answer-text-' + questionId).value.trim();
+  if (answer.length < 20) { alert('Réponse trop courte (min 20 caractères)'); return; }
+  const score = parseInt(document.getElementById('answer-score-' + questionId).value) || 80;
+  const share = document.getElementById('answer-share-' + questionId).checked;
+  const r = await qaFetch('/qa/coach/answer/' + questionId, 'POST', {
+    answer, pertinence_score: score, share_with_cohort: share,
+  });
+  if (r.error) { alert('Erreur : ' + r.error); return; }
+  alert('✓ Réponse envoyée à l\'élève.');
+  load();
 }
 
 async function showDetail(id) {
